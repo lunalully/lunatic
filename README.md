@@ -1,6 +1,6 @@
 # Lunatic
 
-![Banner do Lunatic: o wordmark "Lunatic" em arte ASCII laranja sobre fundo preto, com "Passive Subdomain Recon v0.1.0" abaixo](docs/banner.png)
+![Lunatic em arte ASCII laranja](docs/banner.png)
 
 ```
 
@@ -22,31 +22,31 @@
 
 ```
 
-**Lunatic** é uma ferramenta de código aberto, escrita em Go, para descoberta de subdomínios **estritamente passiva**. Ela consulta apenas provedores de dados de terceiros (logs de Certificate Transparency, arquivos web, bases de DNS passivo, mecanismos de busca de ativos etc.). Ela **nunca** faz varredura, força bruta, resolução de DNS ou requisição HTTP ao alvo.
+Lunatic é uma ferramenta de código aberto, escrita em Go, para descoberta de subdomínios de forma passiva. Ela só consulta bases de terceiros, como logs de Certificate Transparency, arquivos web, DNS passivo e buscadores de ativos. Nunca faz varredura, força bruta, resolução de DNS nem requisição HTTP ao alvo.
 
-## O que o Lunatic descobre (e o que não garante)
+## O que aparece na saída
 
-O resultado é uma lista de **nomes observados em fontes passivas**. Isso **não é prova** de que o nome:
+A lista traz nomes vistos em fontes passivas. Isso não confirma que o subdomínio:
 
-- está online ou responde hoje;
+- está no ar ou responde agora;
 - resolve em DNS;
-- pertence de fato à organização (curingas, SANs de certificados compartilhados e dados comunitários trazem ruído);
-- ainda existe: Certificate Transparency e arquivos web guardam **registros históricos**, então nomes antigos e já desativados aparecem.
+- pertence mesmo à organização (curingas, certificados compartilhados e dados públicos geram ruído);
+- ainda existe: CT e arquivos web guardam registros antigos.
 
-Trate a saída como ponto de partida para investigação, não como inventário confirmado.
+Encare a lista como ponto de partida para a investigação, não como inventário fechado.
 
 ## Instalação (Linux / Kali)
 
-Requisitos: **Go 1.24 ou superior** (linha `go 1.24` do `go.mod`). As dependências (`golang.org/x/net`, `golang.org/x/text`) já vêm em `vendor/`; não é preciso acesso à rede para compilar.
+Precisa de Go 1.24 ou superior (o `go.mod` pede `go 1.24`). As dependências (`golang.org/x/net` e `golang.org/x/text`) já vêm em `vendor/`, então compilar não precisa de rede.
 
-Instale o Go pelo [go.dev/dl](https://go.dev/dl/) ou, no Kali/Debian, por `apt`:
+Instale o Go pelo [go.dev/dl](https://go.dev/dl/) ou, no Kali/Debian, pelo `apt`:
 
 ```bash
 sudo apt update && sudo apt install golang-go
 go version    # confira se é 1.24 ou superior; se for mais antigo, use o go.dev
 ```
 
-> O pacote `golang-go` de algumas versões do Kali/Debian pode ser mais antigo que 1.24. Nesse caso instale o Go pelo go.dev.
+> O pacote `golang-go` de algumas versões do Kali/Debian pode ser mais antigo que 1.24. Nesse caso, instale pelo go.dev.
 
 Baixe o código e compile:
 
@@ -61,11 +61,11 @@ make install      # compila e instala em /usr/local/bin (ou ~/go/bin se não hou
 go build -o lunatic ./cmd/lunatic
 ```
 
-`make install` aceita `PREFIX=/outro/caminho`. Se instalou em `~/go/bin`, garanta que ele esteja no `PATH`.
+`make install` aceita `PREFIX=/outro/caminho`. Se instalou em `~/go/bin`, confira se ele está no `PATH`.
 
 ## Primeiro uso (sem configuração)
 
-Funciona sem nenhuma chave de API. Só as fontes gratuitas rodam:
+Funciona sem nenhuma chave de API; só as fontes gratuitas rodam:
 
 ```bash
 lunatic -d example.com
@@ -90,7 +90,7 @@ lunatic --help
 lunatic --version
 ```
 
-`-d` pode ser repetido ou receber lista separada por vírgulas (`-d a.com,b.com`). Em `-dL`, linhas vazias e comentários iniciados por `#` são ignorados.
+`-d` pode ser repetido ou receber vários domínios separados por vírgula (`-d a.com,b.com`). Em `-dL`, linhas vazias e linhas começadas por `#` são ignoradas.
 
 ## Flags
 
@@ -121,14 +121,14 @@ Nomes de fontes desconhecidos em `-s` ou `--exclude-sources` geram erro de uso (
 
 ## Configuração de APIs
 
-Muitas fontes exigem (ou aceitam opcionalmente) uma chave. A configuração vem de um arquivo YAML e/ou de variáveis de ambiente.
+Muitas fontes exigem uma chave de API; outras aceitam uma chave opcional para ampliar a cota. A configuração vem de um arquivo YAML, de variáveis de ambiente, ou dos dois.
 
-**Precedência: variável de ambiente > arquivo.**
+Se o mesmo campo estiver nos dois lugares, a variável de ambiente vence.
 
-- Caminho padrão: `$XDG_CONFIG_HOME/lunatic/config.yaml`, ou `~/.config/lunatic/config.yaml`. Um arquivo padrão ausente não é erro; um `--config` explícito que não pode ser lido é erro (código 1).
-- Variável de ambiente: `LUNATIC_<FONTE>_<CAMPO>`, em maiúsculas (o que não for letra/número vira `_`). Ex.: `LUNATIC_SHODAN_API_KEY`, `LUNATIC_FOFA_EMAIL`.
-- Valores vazios e placeholders (`<...>`, `YOUR_...`, `CHANGEME`, `TODO`, `NONE`, `NULL`) contam como **sem chave**.
-- `lunatic --list-sources` mostra, para cada fonte, os nomes exatos das variáveis.
+- Caminho padrão do arquivo: `$XDG_CONFIG_HOME/lunatic/config.yaml` ou `~/.config/lunatic/config.yaml`. Se o arquivo padrão não existir, tudo bem; mas um `--config` explícito que não pode ser lido é erro (código 1).
+- Variável de ambiente: `LUNATIC_<FONTE>_<CAMPO>`, em maiúsculas (o que não for letra ou número vira `_`). Ex.: `LUNATIC_SHODAN_API_KEY`, `LUNATIC_FOFA_EMAIL`.
+- Valores vazios e placeholders (`<...>`, `YOUR_...`, `CHANGEME`, `TODO`, `NONE`, `NULL`) contam como sem chave.
+- `lunatic --list-sources` mostra os nomes exatos das variáveis de cada fonte.
 
 ```bash
 mkdir -p ~/.config/lunatic
@@ -136,7 +136,7 @@ cp config.example.yaml ~/.config/lunatic/config.yaml
 chmod 600 ~/.config/lunatic/config.yaml    # o Lunatic avisa se o arquivo for legível por todos
 ```
 
-Formato (um subconjunto simples de YAML; use espaços, não tabs):
+O formato é um subconjunto simples de YAML (use espaços, não tabs):
 
 ```yaml
 sources:
@@ -153,48 +153,48 @@ sources:
     host: "2.intelx.io"
 ```
 
-Ou só por ambiente, sem arquivo:
+Ou só por variáveis de ambiente, sem arquivo:
 
 ```bash
 export LUNATIC_VIRUSTOTAL_API_KEY="..."
 lunatic -d example.com
 ```
 
-**Nunca faça commit de chaves reais.** O `config.example.yaml` lista todas as fontes com campos de credencial, com valores vazios. Campos **opcionais** (ex.: `fofa.email`, `intelx.host`, `zoomeyeapi.host`) nunca impedem a fonte de rodar; campos **obrigatórios** ausentes fazem a fonte ser pulada.
+Nunca faça commit de chaves reais. O `config.example.yaml` lista todas as fontes e seus campos, com valores vazios. Campos opcionais (como `fofa.email`, `intelx.host` e `zoomeyeapi.host`) nunca impedem a fonte de rodar; se faltar um campo obrigatório, a fonte é pulada.
 
-## Fontes gratuitas vs. com restrição
+## Fontes gratuitas e fontes com restrição
 
-O que roda em cada modo (a lista completa e o estado real ficam em `lunatic --list-sources`):
+O que roda em cada modo (a lista completa e o estado atual saem em `lunatic --list-sources`):
 
-- **Execução padrão** (sem `-s` nem `--all`): fontes marcadas como padrão que estejam utilizáveis.
-  - **Gratuitas, sem chave**: anubis, crtsh, scanmalware, shodanct, subdomaincenter, thc, waybackarchive.
-  - **Chave opcional** (rodam sem ela; a chave amplia a cota): alienvault, certspotter, hackertarget, submd, urlscan.
-  - **Com chave obrigatória**: entram na execução padrão **somente se a chave estiver configurada**; sem ela aparecem como "needs key" e são puladas.
-- **Não-padrão** (só com `-s nome` ou `--all`): commoncrawl, digitorus, rapiddns, sitedossier (gratuitas, mas pesadas, instáveis ou baseadas em raspagem de HTML), e threatbook e zoomeyeapi (exigem chave).
-- **`--all`**: todas as fontes não desabilitadas. As que precisam de chave e não a têm aparecem como `skipped (missing credentials: ...)` no resumo do `-v`.
-- **Desabilitadas** (binaryedge, censys, chinaz, domainsproject, hudsonrock, robtex, threatcrowd): registradas para cobertura, nunca contatam a rede, mesmo com `-s`. Motivos em [docs/SOURCES.md](docs/SOURCES.md).
+- Execução padrão (sem `-s` nem `--all`): fontes marcadas como padrão e utilizáveis.
+  - Gratuitas e sem chave: anubis, crtsh, scanmalware, shodanct, subdomaincenter, thc, waybackarchive.
+  - Chave opcional (rodam sem ela; a chave amplia a cota): alienvault, certspotter, hackertarget, submd, urlscan.
+  - Chave obrigatória: entram na execução padrão só quando a chave está configurada; sem ela, aparecem como "needs key" e são puladas.
+- Fora do padrão (só com `-s nome` ou `--all`): commoncrawl, digitorus, rapiddns e sitedossier (gratuitas, mas pesadas, instáveis ou baseadas em raspagem de HTML), além de threatbook e zoomeyeapi, que exigem chave.
+- `--all`: todas as fontes não desabilitadas. As que precisam de chave e não têm aparecem como `skipped (missing credentials: ...)` no resumo do `-v`.
+- Desabilitadas (binaryedge, censys, chinaz, domainsproject, hudsonrock, robtex, threatcrowd): ficam registradas para cobertura, mas nunca contatam a rede, nem com `-s`. Os motivos estão em [docs/SOURCES.md](docs/SOURCES.md).
 
-Detalhes por fonte (endpoint, plano, limitações, situação de verificação): **[docs/SOURCES.md](docs/SOURCES.md)**.
+Detalhes de cada fonte (endpoint, plano, limites e situação de verificação) ficam em **[docs/SOURCES.md](docs/SOURCES.md)**.
 
 ## Formatos de saída
 
-Os resultados vão **sempre para o stdout**. Com `-o arquivo`, os mesmos dados são **também** gravados no arquivo (criado ou truncado), no formato escolhido (`--json` ou texto). Nunca há ANSI, banner ou resumo nos dados. A escrita acontece ao final da execução, não em fluxo contínuo.
+Os resultados vão sempre para o stdout. Com `-o arquivo`, os mesmos dados também são gravados no arquivo (criado ou truncado), no formato escolhido (`--json` ou texto). Os dados nunca levam ANSI, banner ou resumo, e são escritos no fim da execução, não em fluxo contínuo.
 
-**Texto (padrão)**: um subdomínio por linha, sem repetições.
+Texto (padrão): um subdomínio por linha, sem repetições.
 
 ```
 api.example.com
 www.example.com
 ```
 
-**JSON Lines (`--json`)**: um objeto por linha, apenas com `domain` e `subdomain` (sem nomes de fontes).
+JSON Lines (`--json`): um objeto por linha, só com `domain` e `subdomain` (sem nomes de fontes).
 
 ```json
 {"domain":"example.com","subdomain":"api.example.com"}
 {"domain":"example.com","subdomain":"www.example.com"}
 ```
 
-Com `--json --show-sources`, cada registro ganha o array `sources` com as fontes que observaram o nome (a saída de texto nunca inclui fontes):
+Com `--json --show-sources`, cada registro ganha o array `sources` com as fontes que viram o nome (a saída de texto nunca inclui fontes):
 
 ```json
 {"domain":"example.com","subdomain":"api.example.com","sources":["crtsh","waybackarchive"]}
@@ -219,27 +219,27 @@ Com `--silent`, o stderr só recebe erros fatais (sem banner). Assim `lunatic ..
 | `3` | Sucesso parcial: ao menos uma fonte teve sucesso e ao menos uma falhou |
 | `130` | Interrompido (SIGINT/SIGTERM); resultados parciais ainda são escritos |
 
-Fontes **puladas** (sem chave, desabilitadas) não contam como falha para o código `3`.
+Fontes puladas (sem chave ou desabilitadas) não contam como falha para o código `3`.
 
-A saída é limpa por padrão (nada sobre fontes no stderr), então o **código de saída** é o sinal de que alguma fonte falhou (`3` parcial, `2` nenhuma teve sucesso). Rode com `-v` para ver quais.
+Como a saída é limpa por padrão, o código de saída é o sinal de que alguma fonte falhou (`3` parcial, `2` nenhuma teve sucesso). Rode com `-v` para ver quais.
 
-## Interpretando falhas, resultados vazios e registros históricos
+## Falhas, resultados vazios e registros antigos
 
-Por padrão o Lunatic não imprime nada sobre fontes. Para saber quais fontes falharam, foram puladas ou funcionaram, **use `-v`**: o resumo (stderr) lista cada fonte como `ok N`, `skipped (motivo)` ou `failed (tipo): mensagem`. Tipos de falha: `no_key`, `auth` (chave inválida ou plano sem acesso), `rate_limited` (cota/limite de taxa), `timeout`, `unexpected` (resposta em formato inesperado, provedor mudou), `unavailable` (5xx, desafio anti-bot), `blocked` (guarda passiva), `canceled`.
+Por padrão o Lunatic não imprime nada sobre as fontes. Para ver o que aconteceu, use `-v`: o resumo (no stderr) lista cada fonte como `ok N`, `skipped (motivo)` ou `failed (tipo): mensagem`. Tipos de falha: `no_key`, `auth` (chave inválida ou plano sem acesso), `rate_limited` (cota ou limite de taxa), `timeout`, `unexpected` (formato de resposta inesperado, provedor mudou), `unavailable` (5xx, desafio anti-bot), `blocked` (guarda passiva) e `canceled`.
 
-- **Resultado vazio não é erro.** Um domínio pequeno pode simplesmente não aparecer nas fontes.
-- **Falha parcial (código 3)** é comum: fontes gratuitas como crt.sh oscilam. Rode de novo com `-v` para ver quais fontes falharam e por quê, e aumente `--timeout` se necessário.
-- **`auth`** costuma indicar chave inválida ou plano que não inclui o endpoint. **`unexpected`** pode indicar que o provedor mudou o formato: veja a seção de contribuição para reportar.
-- **Nomes históricos**: CT e arquivos web guardam registros antigos. Um nome listado pode ter sido desativado anos atrás.
-- Serviços limitam a cota gratuita e podem truncar resultados sem avisar (ver [docs/SOURCES.md](docs/SOURCES.md)).
+- Resultado vazio não é erro: um domínio pequeno pode simplesmente não aparecer nas fontes.
+- Falha parcial (código `3`) é comum, porque fontes gratuitas como o crt.sh oscilam. Rode de novo com `-v` para ver o que falhou e aumente `--timeout` se precisar.
+- `auth` costuma ser chave inválida ou plano sem acesso ao endpoint. `unexpected` pode indicar que o provedor mudou o formato; veja como reportar na seção de contribuição.
+- Nomes históricos: CT e arquivos web guardam registros antigos, então um nome listado pode ter sido desativado anos atrás.
+- Serviços de terceiros limitam a cota gratuita e podem truncar resultados sem avisar (veja [docs/SOURCES.md](docs/SOURCES.md)).
 
-## Limites passivos (garantias de projeto)
+## Limites passivos (garantias do projeto)
 
-- **Sem força bruta** de nomes.
-- **Sem resolução de DNS** dos resultados.
-- **Sem HTTP para o alvo**: todo acesso de rede passa por um único cliente (`internal/httpx`) que **recusa** qualquer requisição ao domínio-alvo ou seus subdomínios.
-- **Guarda de redirecionamento**: redirecionamentos para o alvo são bloqueados; no máximo 3 saltos; só para o mesmo host (ou http para https no mesmo host).
-- Nunca segue links encontrados nos resultados, nunca dispara jobs/scans nos provedores, e guarda apenas nomes (sem e-mails, IPs ou dados pessoais).
+- Sem força bruta de nomes.
+- Sem resolução de DNS dos resultados.
+- Sem HTTP para o alvo: todo acesso de rede passa por um único cliente (`internal/httpx`), que recusa qualquer requisição ao domínio-alvo ou aos subdomínios dele.
+- Redirecionamentos para o alvo são bloqueados; no máximo 3 saltos e só para o mesmo host (ou de http para https no mesmo host).
+- Nada de seguir links encontrados nos resultados nem disparar jobs/scans nos provedores. Só nomes são guardados (sem e-mails, IPs ou dados pessoais).
 - Fontes de raspagem (digitorus, rapiddns, sitedossier) nunca contornam CAPTCHA ou desafios anti-bot.
 
 ## Integração com pipes
@@ -248,10 +248,9 @@ Com `--silent` a saída é só dados:
 
 ```bash
 lunatic -d example.com --silent | sort -u > subs.txt
-lunatic -d example.com --silent | httpx
 ```
 
-> **Atenção:** o Lunatic é passivo, mas ferramentas como **httpx**, **dnsx**, nmap etc. fazem **verificação ATIVA** contra os alvos (resolvem DNS e enviam requisições aos hosts). Só as use em alvos para os quais você tem **autorização explícita**. Encadear no pipe torna a etapa seguinte ativa; a responsabilidade é sua.
+> Atenção: o Lunatic é passivo, mas o que você encadear no pipe pode ser ativo (resolver DNS, mandar requisições aos hosts). Use em alvos para os quais você tem autorização explícita.
 
 ## Como adicionar e testar uma nova fonte (adaptador)
 
@@ -268,7 +267,7 @@ Resumo; as regras completas estão em [AGENTS.md](AGENTS.md) e [CONTRIBUTING.md]
 
 ## Sobre esta versão: testes ao vivo
 
-Nesta build **não foi possível testar contra os provedores reais**: o ambiente de construção só tinha egress por proxy que bloqueava os hosts (403 em `CONNECT`). Todas as fontes têm testes com fixture, mas **nenhuma foi confirmada ao vivo**, e vários formatos de resposta seguem a documentação e referências de terceiros. Rode localmente `scripts/live-smoke.sh` (teste de fumaça com rede real) e reporte divergências. Lista dos pontos mais incertos em [docs/SOURCES.md](docs/SOURCES.md).
+Esta build não foi testada contra os provedores reais: o ambiente de build só tinha saída por proxy, que bloqueava as conexões (403 no `CONNECT`). Todas as fontes têm testes com fixtures, mas nenhuma foi confirmada ao vivo, e vários formatos de resposta seguem a documentação dos provedores. Rode `scripts/live-smoke.sh` localmente (teste de fumaça com rede real) e reporte divergências. Os pontos mais incertos estão em [docs/SOURCES.md](docs/SOURCES.md).
 
 ## Licença
 
