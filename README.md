@@ -1,22 +1,18 @@
 # Lunatic
 
 ```
-                                                              lu
-                                                             nati
-                                                            clunat
-                                                            ic  lu
-  ▓     ▓   ▓ ▓   ▓  ▓▓▓  ▓▓▓▓▓ ▓▓▓▓▓  ▓▓▓▓                nat  icl
-  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                   una    tic
-  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓        lunaticlunati      clunaticlunat
-  ▓     ▓   ▓ ▓ ▓ ▓ ▓▓▓▓▓   ▓     ▓   ▓         iclu                      nati
-  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓            clun                atic
-  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓               luna          ticl
-  ▓▓▓▓▓  ▓▓▓  ▓   ▓ ▓   ▓   ▓   ▓▓▓▓▓  ▓▓▓▓            una          tic
-                                                       lu            na
-                                                      ti    clunat    ic
-  Passive Subdomain Recon  v0.1.0                    lun atic    luna tic
-                                                     lunati        clunat
-                                                    iclu              nati
+                                                           lun
+  ▓     ▓   ▓ ▓   ▓  ▓▓▓  ▓▓▓▓▓ ▓▓▓▓▓  ▓▓▓▓               aticl
+  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                  unaticl
+  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                 unat iclu
+  ▓     ▓   ▓ ▓ ▓ ▓ ▓▓▓▓▓   ▓     ▓   ▓        naticlunatic   lunaticlunat
+  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓        icluna               ticlun
+  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓           aticl           unati
+  ▓▓▓▓▓  ▓▓▓  ▓   ▓ ▓   ▓   ▓   ▓▓▓▓▓  ▓▓▓▓          clun       atic
+                                                     lun    a    tic
+                                                     lun aticlun ati
+  Passive Subdomain Recon  v0.1.0                   clunati   clunati
+                                                   clunat       icluna
 ```
 
 **Lunatic** é uma ferramenta de código aberto, escrita em Go, para descoberta de subdomínios **estritamente passiva**. Ela consulta apenas provedores de dados de terceiros (logs de Certificate Transparency, arquivos web, bases de DNS passivo, mecanismos de busca de ativos etc.). Ela **nunca** faz varredura, força bruta, resolução de DNS ou requisição HTTP ao alvo.
