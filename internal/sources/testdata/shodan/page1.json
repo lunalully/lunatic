@@ -1,0 +1,1 @@
+{"domain":"example.com","tags":["ipv6"],"subdomains":["www","api","*.wild","","mail.example.com"],"data":[{"subdomain":"www","type":"A","value":"192.0.2.1","last_seen":"2026-01-01T00:00:00Z"},{"subdomain":"dev","type":"CNAME","value":"x.other.test"},{"subdomain":"","type":"MX","value":"mail.example.com"}],"more":true}

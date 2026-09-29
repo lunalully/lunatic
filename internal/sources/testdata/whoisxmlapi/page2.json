@@ -1,0 +1,1 @@
+{"search":"example.com","result":{"count":5,"records":[{"domain":"api.example.com","firstSeen":1,"lastSeen":2},{"domain":"*.wild.example.com","firstSeen":1,"lastSeen":2}]}}

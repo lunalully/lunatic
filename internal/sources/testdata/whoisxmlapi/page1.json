@@ -1,0 +1,1 @@
+{"search":"example.com","result":{"count":5,"records":[{"domain":"www.example.com","firstSeen":1600000000,"lastSeen":1700000000},{"domain":"evil.test","firstSeen":1,"lastSeen":2}],"nextPageSearchAfter":"CUR2"}}

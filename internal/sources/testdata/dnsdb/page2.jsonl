@@ -1,0 +1,3 @@
+{"cond":"begin"}
+{"obj":{"count":2,"time_first":1600000000,"time_last":1700000000,"rrname":"mail.example.com.","rrtype":"MX","rdata":["10 mx.example.com."]}}
+{"cond":"succeeded"}

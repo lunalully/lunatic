@@ -1,0 +1,1 @@
+{"data":[{"id":"www.example.com","type":"domain","links":{"self":"https://www.virustotal.com/api/v3/domains/www.example.com"}},{"id":"api.example.com","type":"domain"},{"id":"evil.test","type":"domain"}],"meta":{"cursor":"CUR2","count":5},"links":{"self":"x","next":"y"}}

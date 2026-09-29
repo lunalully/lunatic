@@ -1,0 +1,1 @@
+{"domain":"example.com","subdomains":["blog","staging"],"data":[{"subdomain":"blog","type":"A","value":"192.0.2.9"}],"more":false}

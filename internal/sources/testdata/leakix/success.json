@@ -1,0 +1,1 @@
+[{"subdomain":"www.example.com","distinct_ips":2,"last_seen":"2026-01-01T00:00:00Z"},{"subdomain":"api.example.com","distinct_ips":1,"last_seen":"2026-01-02T00:00:00Z"}]

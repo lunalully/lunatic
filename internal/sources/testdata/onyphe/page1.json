@@ -1,0 +1,1 @@
+{"error":0,"status":"ok","count":2,"page":1,"page_size":2,"total":3,"max_page":2,"results":[{"category":"resolver","domain":"example.com","hostname":"www.example.com","forward":"192.0.2.1"},{"category":"resolver","domain":["example.com"],"hostname":["mail.example.com","smtp.example.com"],"subdomains":["mx.example.com"]}]}

@@ -1,0 +1,1 @@
+{"domain":"example.com","subdomains":[{"subdomain":"www.example.com","ips":["192.0.2.1"]},{"subdomain":"api.example.com"}]}

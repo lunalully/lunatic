@@ -1,0 +1,5 @@
+www.example.com
+data: api.example.com
+
+: keepalive
+mail.example.com

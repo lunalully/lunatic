@@ -1,0 +1,1 @@
+[{"data":{"domain":"www.example.com","zone":"com","level":3,"a":["192.0.2.1"],"last_updated":"2024-05-01"}},{"data":{"domain":"mail.example.com","zone":"com","level":3}},{"data":{"domain":"api.example.com"}}]

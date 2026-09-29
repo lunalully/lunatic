@@ -1,0 +1,1 @@
+{"success":true,"subdomains":[{"subdomain":"www.example.com","ip":"192.0.2.1","cloudflare":false},{"subdomain":".hidden.example.com","ip":"192.0.2.2","cloudflare":true},{"subdomain":"api.example.com","ip":"192.0.2.3","cloudflare":true}]}

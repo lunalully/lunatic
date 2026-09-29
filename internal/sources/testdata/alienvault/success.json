@@ -1,0 +1,1 @@
+{"passive_dns":[{"hostname":"www.example.com"},{"hostname":"api.example.com"},{"hostname":"*.wild.example.com"},{"hostname":"host.other-example.org"},{"hostname":""}]}

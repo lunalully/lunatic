@@ -1,0 +1,1 @@
+{"response_code":0,"verbose_msg":"OK","data":{"domain":"example.com","sub_domains":{"total":"4","data":["www.example.com","api.example.com","*.wild.example.com","evil.test"]}}}

@@ -1,0 +1,1 @@
+[{"id":"100","dns_names":["example.com","www.example.com","*.example.com"]},{"id":"101","dns_names":["api.example.com","unrelated.other.test"]}]

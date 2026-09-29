@@ -1,0 +1,21 @@
+# build output
+bin/
+dist/
+/lunatic
+*.exe
+
+# test/coverage
+coverage.out
+*.test
+*.prof
+
+# real credentials (only config.example.yaml is tracked)
+config.yaml
+!config.example.yaml
+.env
+
+# editor/OS
+.idea/
+.vscode/
+.DS_Store
+smoke-logs/

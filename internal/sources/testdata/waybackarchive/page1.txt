@@ -1,0 +1,9 @@
+http://www.example.com/
+https://api.example.com:8443/v1/users?u=admin@other.test
+http://EVIL.test/x?h=www.example.com
+http://user:pw@mail.example.com/index.html
+http://www.example.com/a
+http://%2Ashop.example.com/
+http://notexample.com/
+
+RESUME123

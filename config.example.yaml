@@ -1,0 +1,155 @@
+# Lunatic - exemplo de configuracao de credenciais de APIs.
+#
+# Caminho padrao : $XDG_CONFIG_HOME/lunatic/config.yaml
+#                  (ou ~/.config/lunatic/config.yaml se XDG_CONFIG_HOME nao estiver definido)
+#                  Ou use: lunatic --config /caminho/config.yaml
+#
+# Uso:
+#   mkdir -p ~/.config/lunatic
+#   cp config.example.yaml ~/.config/lunatic/config.yaml
+#   chmod 600 ~/.config/lunatic/config.yaml   # o Lunatic avisa se o arquivo for legivel por todos
+#
+# Precedencia: variavel de ambiente > arquivo.
+#   Variavel: LUNATIC_<FONTE>_<CAMPO>  (maiusculas; o que nao for letra/numero vira "_")
+#   Exemplos: LUNATIC_SHODAN_API_KEY, LUNATIC_FOFA_EMAIL, LUNATIC_INTELX_HOST
+#
+# Valores vazios ("") e placeholders (<...>, YOUR_..., CHANGEME, TODO, NONE, NULL)
+# contam como "sem chave". Fontes que exigem chave sao puladas quando ela falta;
+# fontes com chave opcional funcionam sem ela. Rode `lunatic --list-sources`
+# para ver o estado atual e os nomes exatos das variaveis.
+#
+# NUNCA faca commit de chaves reais. Preencha apenas a sua copia local.
+#
+# Formato aceito (subconjunto simples de YAML): sources -> <fonte> -> <campo>: "valor"
+# Use espacos (nao tabs). Valores entre aspas simples ou duplas.
+#
+# Legenda dos comentarios:  [obrigatoria] a fonte so roda com esta credencial;
+# [opcional] a fonte roda sem ela; [desabilitada] a fonte esta registrada mas nao executa.
+
+sources:
+  alienvault:        # [opcional] chave OTX gratuita; aumenta a cota por hora
+    api_key: ""
+
+  bevigil:           # [obrigatoria] CloudSEK BeVigil OSINT API (chave gratuita, creditos limitados)
+    api_key: ""
+
+  bufferover:        # [obrigatoria] tls.bufferover.run (plano gratuito: ~100 req/mes, uso nao comercial)
+    api_key: ""
+
+  builtwith:         # [obrigatoria] Domain API paga (a API gratuita nao lista subdominios)
+    api_key: ""
+
+  c99:               # [obrigatoria] plano pago
+    api_key: ""
+
+  censys:            # [desabilitada] Censys Platform: token pessoal + id da organizacao (reservado)
+    api_token: ""
+    organization_id: ""
+
+  certspotter:       # [opcional] SSLMate Cert Spotter; sem chave ha uma cota horaria pequena
+    api_key: ""
+
+  chaos:             # [obrigatoria] ProjectDiscovery Chaos
+    api_key: ""
+
+  chinaz:            # [desabilitada] reservado
+    api_key: ""
+
+  digitalyama:       # [obrigatoria] 25 creditos gratuitos, depois pago
+    api_key: ""
+
+  dnsdb:             # [obrigatoria] DomainTools/Farsight DNSDB (pago)
+    api_key: ""
+
+  dnsdumpster:       # [obrigatoria] chave gratuita: 50 req/dia, 50 registros por dominio
+    api_key: ""
+
+  dnsrepo:           # [obrigatoria] DNSArchive (antigo DNSRepo): apikey (query) + token de acesso (cabecalho); pago
+    apikey: ""
+    token: ""
+
+  domainsproject:    # [desabilitada] API so por aprovacao; reservado
+    username: ""
+    password: ""
+
+  driftnet:          # [obrigatoria] token Bearer; cota comunitaria gratuita por solicitacao
+    api_key: ""
+
+  fofa:              # key [obrigatoria]; email [opcional] (so contas antigas ainda podem exigir)
+    key: ""
+    email: ""
+
+  fullhunt:          # [obrigatoria] plano limita/trunca resultados
+    api_key: ""
+
+  github:            # [obrigatoria] token de acesso pessoal (busca de codigo: 10 req/min)
+    token: ""
+
+  hackertarget:      # [opcional] sem chave: cota gratuita pequena por IP
+    api_key: ""
+
+  intelx:            # api_key [obrigatoria]; host [opcional] (padrao free.intelx.io)
+    api_key: ""
+    host: ""         # ex.: 2.intelx.io (contas pagas) ou public.intelx.io; deve casar com o plano da chave
+
+  leakix:            # [obrigatoria] plano gratuito com resultados atrasados
+    api_key: ""
+
+  merklemap:         # [obrigatoria] plano pago
+    api_key: ""
+
+  netlas:            # [obrigatoria] plano Community gratuito (uso nao comercial, ~50 req/dia)
+    api_key: ""
+
+  onyphe:            # [obrigatoria] planos pagos
+    api_key: ""
+
+  profundis:         # [obrigatoria] assinatura/creditos
+    api_key: ""
+
+  pugrecon:          # [obrigatoria] cota gratuita minuscula
+    api_key: ""
+
+  quake:             # [obrigatoria] Quake 360 (token X-QuakeToken; consome pontos de cota)
+    api_key: ""
+
+  reconeer:          # [obrigatoria] plano gratuito: 10 consultas/dia
+    api_key: ""
+
+  redhuntlabs:       # [obrigatoria] plano community gratuito: 100 req/mes
+    api_key: ""
+
+  rsecloud:          # [obrigatoria] limites do plano desconhecidos
+    api_key: ""
+
+  securitytrails:    # [obrigatoria] plano pago
+    api_key: ""
+
+  shodan:            # [obrigatoria] o endpoint de DNS costuma exigir plano pago/membership
+    api_key: ""
+
+  submd:             # [opcional] sem chave: 50 consultas/dia
+    api_key: ""
+
+  threatbook:        # [obrigatoria] fora da execucao padrao (use -s threatbook ou --all)
+    api_key: ""
+
+  urlscan:           # [opcional] sem chave: cotas anonimas pequenas
+    api_key: ""
+
+  virustotal:        # [obrigatoria] chave gratuita: 4 req/min, 500/dia, uso nao comercial
+    api_key: ""
+
+  whoisxmlapi:       # [obrigatoria] creditos por requisicao
+    api_key: ""
+
+  windvane:          # [obrigatoria]
+    api_key: ""
+
+  zoomeyeapi:        # api_key [obrigatoria]; host [opcional] (fora da execucao padrao: use -s zoomeyeapi)
+    api_key: ""
+    host: ""         # ex.: zoomeye.hk (padrao zoomeye.ai)
+
+# Sem credenciais (nada a configurar): anubis, commoncrawl, crtsh, digitorus, rapiddns,
+# scanmalware (chave opcional nao suportada), shodanct, sitedossier, subdomaincenter, thc,
+# waybackarchive. Desabilitadas sem campos: binaryedge, hudsonrock, robtex, threatcrowd.

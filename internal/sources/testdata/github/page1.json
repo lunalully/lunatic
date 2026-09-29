@@ -1,0 +1,3 @@
+{"total_count":3,"incomplete_results":false,"items":[
+{"name":"config.yml","path":"deploy/config.yml","html_url":"https://github.com/o/r/blob/x/config.yml","text_matches":[{"fragment":"host = api.example.com\ntoken = SECRET123","matches":[{"text":"example.com","indices":[7,18]}]}]},
+{"name":"README.md","path":"README.md","text_matches":[{"fragment":"see https://Docs.example.com/guide and notexample.com","matches":[]}]}]}

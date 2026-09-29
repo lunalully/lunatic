@@ -1,0 +1,1 @@
+{"count":3,"results":[{"hostname":"www.example.com","subject_common_name":"www.example.com","first_seen":"2024-01-02T03:04:05Z"},{"hostname":"*.dev.example.com","subject_common_name":"*.dev.example.com","first_seen":"2024-02-02T03:04:05Z"}]}

@@ -1,0 +1,3 @@
+[{"id":1,"common_name":"www.example.com","name_value":"www.example.com\nexample.com","issuer_ca_id":1},
+ {"id":2,"common_name":"*.example.com","name_value":"*.example.com\napi.example.com\nadmin@example.com"},
+ {"id":3,"common_name":"x.other.test","name_value":"x.other.test"}]

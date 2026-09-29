@@ -1,0 +1,1 @@
+{"Meta":{"Errors":[]},"FDNS_A":["192.0.2.4,www.example.com"],"RDNS":[],"Results":["192.0.2.5,0123456789abcdef,Example Org,api.example.com","192.0.2.6,fedcba,Other Org,host.other.test"]}

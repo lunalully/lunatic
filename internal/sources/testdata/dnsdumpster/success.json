@@ -1,0 +1,2 @@
+{"a":[{"host":"www.example.com","ips":[{"ip":"192.0.2.1","asn":"AS64500"}]},{"host":"api.example.com","ips":[{"ip":"192.0.2.2"}]}],
+"cname":[{"host":"cdn.example.com","ips":[]}],"mx":[{"host":"mail.example.com","ips":[]}],"ns":[{"host":"ns1.example.com","ips":[]}],"txt":["v=spf1 -all"]}
