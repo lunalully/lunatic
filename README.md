@@ -222,10 +222,6 @@ Resumo; as regras completas estão em [AGENTS.md](AGENTS.md) e [CONTRIBUTING.md]
 7. Rode `make test` (e `make check` antes de abrir PR: `go vet`, testes, `-race`, `gofmt`).
 8. Documente a fonte em `docs/SOURCES.md` e, se houver credenciais, em `config.example.yaml`.
 
-## Sobre esta versão: testes ao vivo
-
-Esta build não foi testada contra os provedores reais: o ambiente de build só tinha saída por proxy, que bloqueava as conexões (403 no `CONNECT`). Todas as fontes têm testes com fixtures, mas nenhuma foi confirmada ao vivo, e vários formatos de resposta seguem a documentação dos provedores. Rode `scripts/live-smoke.sh` localmente (teste de fumaça com rede real) e reporte divergências. Os pontos mais incertos estão em [docs/SOURCES.md](docs/SOURCES.md).
-
 ## Licença
 
 MIT. Veja [LICENSE](LICENSE). Copyright (c) 2026 Lunatic contributors.
