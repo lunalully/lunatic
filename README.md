@@ -273,10 +273,3 @@ Nesta build **não foi possível testar contra os provedores reais**: o ambiente
 ## Licença
 
 MIT. Veja [LICENSE](LICENSE). Copyright (c) 2026 Lunatic contributors.
-
-O banner (wordmark e desenho) é arte ASCII enviada pela autora do projeto; não usa fonte FIGlet nem código de terceiros.
-
-**Avisos de terceiros (NOTICE):**
-
-- O diretório `vendor/` inclui `golang.org/x/net` e `golang.org/x/text`, licenciados sob BSD-3-Clause, Copyright The Go Authors. O texto da licença acompanha cada módulo em `vendor/`.
-- Nenhum código do **Subfinder** foi copiado. O código do Subfinder (MIT, ProjectDiscovery) foi usado apenas como **referência** para localizar endpoints de provedores. Todos os adaptadores foram escritos de forma independente.
