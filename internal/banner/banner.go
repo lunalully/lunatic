@@ -1,5 +1,5 @@
 // Package banner renders the Lunatic header: the "luNatiC" wordmark (ASCII
-// art supplied by the author) with a small ASCII drawing to its right.
+// art supplied by the author) and the tagline below it.
 package banner
 
 import (
@@ -27,23 +27,9 @@ var Word = []string{
 	"      `-'  `--' '--'   '--' '--'  `\"   `'-'",
 }
 
-// Art is the drawing shown to the right of the wordmark, reproduced exactly
-// as supplied by the author (7 rows, leading spaces are significant).
-const Art = `___    A
-| |   {*}
-| |  __V__
-|_|o_|%%%|0_
-   |       |
-   |       |
-   |_______|`
-
 const (
-	gap     = 4
 	tagline = "Passive Subdomain Recon  v"
 )
-
-// ArtLines returns the rows of Art.
-func ArtLines() []string { return strings.Split(Art, "\n") }
 
 // width in columns (runes) of the widest row.
 func width(rows []string) int {
@@ -56,19 +42,9 @@ func width(rows []string) int {
 	return w
 }
 
-func pad(s string, w int) string {
-	if n := len([]rune(s)); n < w {
-		return s + strings.Repeat(" ", w-n)
-	}
-	return s
-}
-
 // Render returns the banner text. lvl None yields plain text with no ANSI.
-// The drawing is aligned to the bottom row of the wordmark; the tagline
-// goes under the wordmark, after a blank line.
+// The tagline goes under the wordmark, after a blank line.
 func Render(version string, lvl term.Level) string {
-	art := ArtLines()
-	ww := width(Word)
 	var b strings.Builder
 	b.WriteString("\n")
 	emit := func(line string) {
@@ -77,13 +53,8 @@ func Render(version string, lvl term.Level) string {
 		}
 		b.WriteString("\n")
 	}
-	off := len(Word) - len(art)
-	for i, w := range Word {
-		line := pad(w, ww)
-		if j := i - off; j >= 0 {
-			line += strings.Repeat(" ", gap) + art[j]
-		}
-		emit(line)
+	for _, w := range Word {
+		emit(w)
 	}
 	emit("")
 	emit(tagline + version)

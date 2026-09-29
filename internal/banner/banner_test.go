@@ -9,29 +9,6 @@ import (
 	"github.com/lunalully/lunatic/internal/term"
 )
 
-// wantArt is the drawing exactly as supplied by the author.
-var wantArt = []string{
-	"___    A",
-	"| |   {*}",
-	"| |  __V__",
-	"|_|o_|%%%|0_",
-	"   |       |",
-	"   |       |",
-	"   |_______|",
-}
-
-func TestArtExact(t *testing.T) {
-	got := ArtLines()
-	if len(got) != len(wantArt) {
-		t.Fatalf("art rows: got %d want %d", len(got), len(wantArt))
-	}
-	for i := range wantArt {
-		if got[i] != wantArt[i] {
-			t.Errorf("art row %d: got %q want %q", i, got[i], wantArt[i])
-		}
-	}
-}
-
 func TestWordShape(t *testing.T) {
 	if len(Word) != 13 {
 		t.Fatalf("word rows: %d", len(Word))
@@ -72,13 +49,9 @@ func TestRenderGolden(t *testing.T) {
 	if !strings.Contains(got, "Passive Subdomain Recon  v1.2.3") {
 		t.Fatal("tagline missing")
 	}
-	// the drawing sits 4 columns right of the wordmark, bottom aligned
-	off := len(Word) - len(wantArt)
-	for j, a := range wantArt {
-		l := lines[1+off+j]
-		want := strings.TrimRight("  "+pad(Word[off+j], width(Word))+"    "+a, " ")
-		if l != want {
-			t.Errorf("row %d: got %q want %q", off+j, l, want)
+	for _, l := range lines {
+		if l != strings.TrimRight(l, " ") {
+			t.Errorf("trailing spaces: %q", l)
 		}
 	}
 }
