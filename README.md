@@ -119,49 +119,6 @@ Valores padrão conforme `internal/cli/cli.go`.
 
 Nomes de fontes desconhecidos em `-s` ou `--exclude-sources` geram erro de uso (código 1) com a lista de nomes válidos.
 
-## Configuração de APIs
-
-Muitas fontes exigem uma chave de API; outras aceitam uma chave opcional para ampliar a cota. A configuração vem de um arquivo YAML, de variáveis de ambiente, ou dos dois.
-
-Se o mesmo campo estiver nos dois lugares, a variável de ambiente vence.
-
-- Caminho padrão do arquivo: `$XDG_CONFIG_HOME/lunatic/config.yaml` ou `~/.config/lunatic/config.yaml`. Se o arquivo padrão não existir, tudo bem; mas um `--config` explícito que não pode ser lido é erro (código 1).
-- Variável de ambiente: `LUNATIC_<FONTE>_<CAMPO>`, em maiúsculas (o que não for letra ou número vira `_`). Ex.: `LUNATIC_SHODAN_API_KEY`, `LUNATIC_FOFA_EMAIL`.
-- Valores vazios e placeholders (`<...>`, `YOUR_...`, `CHANGEME`, `TODO`, `NONE`, `NULL`) contam como sem chave.
-- `lunatic --list-sources` mostra os nomes exatos das variáveis de cada fonte.
-
-```bash
-mkdir -p ~/.config/lunatic
-cp config.example.yaml ~/.config/lunatic/config.yaml
-chmod 600 ~/.config/lunatic/config.yaml    # o Lunatic avisa se o arquivo for legível por todos
-```
-
-O formato é um subconjunto simples de YAML (use espaços, não tabs):
-
-```yaml
-sources:
-  shodan:
-    api_key: "SUA_CHAVE"
-  dnsrepo:                # fonte com vários campos obrigatórios
-    apikey: "SUA_CHAVE"
-    token: "SEU_TOKEN"
-  fofa:                   # key obrigatória; email opcional
-    key: "SUA_CHAVE"
-    email: ""
-  intelx:                 # api_key obrigatória; host opcional (padrão free.intelx.io)
-    api_key: "SUA_CHAVE"
-    host: "2.intelx.io"
-```
-
-Ou só por variáveis de ambiente, sem arquivo:
-
-```bash
-export LUNATIC_VIRUSTOTAL_API_KEY="..."
-lunatic -d example.com
-```
-
-Nunca faça commit de chaves reais. O `config.example.yaml` lista todas as fontes e seus campos, com valores vazios. Campos opcionais (como `fofa.email`, `intelx.host` e `zoomeyeapi.host`) nunca impedem a fonte de rodar; se faltar um campo obrigatório, a fonte é pulada.
-
 ## Fontes gratuitas e fontes com restrição
 
 O que roda em cada modo (a lista completa e o estado atual saem em `lunatic --list-sources`):
