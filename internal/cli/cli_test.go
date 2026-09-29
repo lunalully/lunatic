@@ -91,6 +91,36 @@ func TestDefaultRun(t *testing.T) {
 	if runs != 2 {
 		t.Fatalf("default run should only use alpha+beta, ran %d", runs)
 	}
+	if r.stderr != "" {
+		t.Fatalf("default run must leave stderr empty (no source noise), got %q", r.stderr)
+	}
+}
+
+func TestCleanOutputHidesSources(t *testing.T) {
+	// Failures, skips, warnings and counts never appear without -v, but the
+	// exit code still signals them.
+	r := do(t, env{}, env0(), "-d", "example.com", "-s", "alpha,boom,keyed,off")
+	if r.code != 3 || r.stderr != "" || r.stdout != "a.example.com\nb.example.com\n" {
+		t.Fatalf("%+v", r)
+	}
+	r = do(t, env{}, env0(), "-d", "example.com", "-s", "boom")
+	if r.code != 2 || r.stderr != "" || r.stdout != "" {
+		t.Fatalf("%+v", r)
+	}
+	r = do(t, env{}, env0(), "-d", "example.com", "-s", "boom", "--silent")
+	if r.code != 2 || r.stderr != "" {
+		t.Fatalf("%+v", r)
+	}
+	r = do(t, env{stderrTTY: true}, map[string]string{"TERM": "dumb"}, "-d", "example.com", "-s", "alpha,boom")
+	for _, bad := range []string{"alpha", "boom", "failed", "skipped", "unique", "ok "} {
+		if strings.Contains(strings.ReplaceAll(r.stderr, "\n", " "), bad) && bad != "ok " {
+			t.Fatalf("banner run leaks %q: %s", bad, r.stderr)
+		}
+	}
+}
+
+func TestVerboseSummary(t *testing.T) {
+	r := do(t, env{}, env0(), "-d", "example.com", "-v")
 	for _, want := range []string{"alpha", "ok 2", "beta", "ok 1", "2 unique subdomain"} {
 		if !strings.Contains(r.stderr, want) {
 			t.Errorf("summary missing %q:\n%s", want, r.stderr)
@@ -98,6 +128,16 @@ func TestDefaultRun(t *testing.T) {
 	}
 	if strings.Contains(r.stderr, "\x1b") || strings.Contains(r.stderr, "Passive Subdomain Recon") {
 		t.Fatal("non-TTY stderr must be plain without banner")
+	}
+	r = do(t, env{}, env0(), "-d", "example.com", "-s", "boom,keyed,off", "-v")
+	for _, want := range []string{"failed (rate_limited)", "skipped", "no source succeeded"} {
+		if !strings.Contains(r.stderr, want) {
+			t.Errorf("verbose missing %q:\n%s", want, r.stderr)
+		}
+	}
+	r = do(t, env{}, env0(), "-d", "example.com", "-s", "boom", "-v", "--silent")
+	if r.stderr != "" {
+		t.Fatalf("--silent must win over -v: %q", r.stderr)
 	}
 }
 
@@ -148,7 +188,7 @@ func TestUnknownSourceListsValid(t *testing.T) {
 }
 
 func TestSkippedReasons(t *testing.T) {
-	r := do(t, env{}, env0(), "-d", "example.com", "-s", "keyed,off,alpha")
+	r := do(t, env{}, env0(), "-d", "example.com", "-s", "keyed,off,alpha", "-v")
 	if !strings.Contains(r.stderr, "missing credentials: LUNATIC_KEYED_API_KEY") || !strings.Contains(r.stderr, "service shut down") {
 		t.Fatal(r.stderr)
 	}
@@ -156,7 +196,7 @@ func TestSkippedReasons(t *testing.T) {
 
 func TestAllReportsMissingKeys(t *testing.T) {
 	var runs int32
-	r := do(t, env{sources: registry(&runs)}, env0(), "-d", "example.com", "--all")
+	r := do(t, env{sources: registry(&runs)}, env0(), "-d", "example.com", "--all", "-v")
 	// alpha, beta ok; boom failed; keyed skipped; off excluded entirely.
 	if r.code != 3 || strings.Contains(r.stderr, "off ") || !strings.Contains(r.stderr, "missing credentials") || !strings.Contains(r.stderr, "boom") {
 		t.Fatalf("%+v", r)
@@ -210,13 +250,23 @@ func TestDomainList(t *testing.T) {
 
 func TestJSON(t *testing.T) {
 	r := do(t, env{}, env0(), "-d", "example.com", "--json")
-	want := `{"domain":"example.com","subdomain":"a.example.com","sources":["alpha"]}` + "\n" +
-		`{"domain":"example.com","subdomain":"b.example.com","sources":["alpha","beta"]}` + "\n"
+	want := `{"domain":"example.com","subdomain":"a.example.com"}` + "\n" +
+		`{"domain":"example.com","subdomain":"b.example.com"}` + "\n"
 	if r.stdout != want {
 		t.Fatalf("%q", r.stdout)
 	}
 	if r2 := do(t, env{}, env0(), "-d", "example.com", "-oJ"); r2.stdout != want {
 		t.Fatal("-oJ alias")
+	}
+	r = do(t, env{}, env0(), "-d", "example.com", "--json", "--show-sources")
+	wantSrc := `{"domain":"example.com","subdomain":"a.example.com","sources":["alpha"]}` + "\n" +
+		`{"domain":"example.com","subdomain":"b.example.com","sources":["alpha","beta"]}` + "\n"
+	if r.stdout != wantSrc {
+		t.Fatalf("%q", r.stdout)
+	}
+	// TXT is always pure names.
+	if r = do(t, env{}, env0(), "-d", "example.com", "--show-sources"); r.stdout != "a.example.com\nb.example.com\n" {
+		t.Fatalf("%q", r.stdout)
 	}
 }
 
@@ -241,7 +291,7 @@ func TestSecretsNeverPrinted(t *testing.T) {
 	for _, args := range [][]string{
 		{"--list-sources"},
 		{"-d", "example.com", "-s", "keyed", "-v"},
-		{"-d", "example.com", "-s", "keyed", "--json"},
+		{"-d", "example.com", "-s", "keyed", "--json", "--show-sources"},
 		{"-d", "example.com", "--all"},
 	} {
 		r := do(t, env{}, envs, args...)
@@ -249,7 +299,7 @@ func TestSecretsNeverPrinted(t *testing.T) {
 			t.Fatalf("%v leaked secret:\nstdout:%s\nstderr:%s", args, r.stdout, r.stderr)
 		}
 	}
-	r := do(t, env{}, envs, "-d", "example.com", "-s", "keyed")
+	r := do(t, env{}, envs, "-d", "example.com", "-s", "keyed", "-v")
 	if r.code != 2 || r.stdout != "k.example.com\n" || !strings.Contains(r.stderr, "[REDACTED]") {
 		t.Fatalf("%+v", r)
 	}
@@ -349,10 +399,14 @@ func TestConfig(t *testing.T) {
 	cf := filepath.Join(t.TempDir(), "c.yaml")
 	os.WriteFile(cf, []byte("sources:\n  keyed:\n    api_key: "+secret+"\n"), 0o644)
 	r := do(t, env{}, env0(), "-d", "example.com", "--config", cf, "-s", "keyed")
+	if r.stderr != "" {
+		t.Fatalf("warnings need -v: %q", r.stderr)
+	}
+	r = do(t, env{}, env0(), "-d", "example.com", "--config", cf, "-s", "keyed", "-v")
 	if r.stdout != "k.example.com\n" || !strings.Contains(r.stderr, "world-readable") || strings.Contains(r.stderr, secret) {
 		t.Fatalf("%+v", r)
 	}
-	r = do(t, env{}, env0(), "-d", "example.com", "--config", cf, "-s", "keyed", "--silent")
+	r = do(t, env{}, env0(), "-d", "example.com", "--config", cf, "-s", "keyed", "-v", "--silent")
 	if strings.Contains(r.stderr, "world-readable") {
 		t.Fatal("silent must suppress warnings")
 	}
@@ -374,7 +428,7 @@ func TestInterrupted(t *testing.T) {
 }
 
 func TestNoUsableSources(t *testing.T) {
-	r := do(t, env{sources: []sources.Source{}}, env0(), "-d", "example.com")
+	r := do(t, env{sources: []sources.Source{}}, env0(), "-d", "example.com", "-v")
 	if r.code != 2 || !strings.Contains(r.stderr, "no usable sources") {
 		t.Fatalf("%+v", r)
 	}

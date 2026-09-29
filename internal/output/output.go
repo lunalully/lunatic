@@ -30,23 +30,37 @@ func WriteTXT(w io.Writer, findings []runner.Finding) error {
 }
 
 type record struct {
-	Domain    string   `json:"domain"`
-	Subdomain string   `json:"subdomain"`
-	Sources   []string `json:"sources"`
+	Domain    string `json:"domain"`
+	Subdomain string `json:"subdomain"`
+}
+
+type recordSrc struct {
+	record
+	Sources []string `json:"sources"`
 }
 
 // WriteJSONL writes one JSON object per finding:
+// {"domain":"example.com","subdomain":"api.example.com"}
+// With withSources, a "sources" array (provenance) is added:
 // {"domain":"example.com","subdomain":"api.example.com","sources":["crtsh"]}
-func WriteJSONL(w io.Writer, findings []runner.Finding) error {
+func WriteJSONL(w io.Writer, findings []runner.Finding, withSources bool) error {
 	bw := bufio.NewWriter(w)
 	enc := json.NewEncoder(bw)
 	enc.SetEscapeHTML(false)
 	for _, f := range findings {
-		srcs := f.Sources
-		if srcs == nil {
-			srcs = []string{}
+		var srcs []string
+		if withSources {
+			srcs = f.Sources
+			if srcs == nil {
+				srcs = []string{}
+			}
 		}
-		if err := enc.Encode(record{f.Domain, f.Subdomain, srcs}); err != nil {
+		r := record{f.Domain, f.Subdomain}
+		var v any = r
+		if withSources {
+			v = recordSrc{r, srcs}
+		}
+		if err := enc.Encode(v); err != nil {
 			return err
 		}
 	}

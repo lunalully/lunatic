@@ -1,14 +1,22 @@
 # Lunatic
 
 ```
-       //     //  // //    //   ****   ****** ****  *****
-      //     //  // //\   //  //  //    //    //  //
-     //     //  // // \  // //    //   //    //  //
-    //     //  // //  \ // //****//   //    //  //
-   //     //  // //   \// //    //   //    //  //
-  //****  ****  //    // //    //   //   ****  *****
-
-  * Passive Subdomain Recon *  v0.1.0
+                                                              lu
+                                                             nati
+                                                            clunat
+                                                            ic  lu
+  ▓     ▓   ▓ ▓   ▓  ▓▓▓  ▓▓▓▓▓ ▓▓▓▓▓  ▓▓▓▓                nat  icl
+  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                   una    tic
+  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓        lunaticlunati      clunaticlunat
+  ▓     ▓   ▓ ▓ ▓ ▓ ▓▓▓▓▓   ▓     ▓   ▓         iclu                      nati
+  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓            clun                atic
+  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓               luna          ticl
+  ▓▓▓▓▓  ▓▓▓  ▓   ▓ ▓   ▓   ▓   ▓▓▓▓▓  ▓▓▓▓            una          tic
+                                                       lu            na
+                                                      ti    clunat    ic
+  Passive Subdomain Recon  v0.1.0                    lun atic    luna tic
+                                                     lunati        clunat
+                                                    iclu              nati
 ```
 
 **Lunatic** é uma ferramenta de código aberto, escrita em Go, para descoberta de subdomínios **estritamente passiva**. Ela consulta apenas provedores de dados de terceiros (logs de Certificate Transparency, arquivos web, bases de DNS passivo, mecanismos de busca de ativos etc.). Ela **nunca** faz varredura, força bruta, resolução de DNS ou requisição HTTP ao alvo.
@@ -70,7 +78,9 @@ lunatic -d example.com -o subdominios.txt                # também grava em arqu
 lunatic -dL dominios.txt -o resultados.txt               # lista de domínios (um por linha)
 lunatic -d example.com -s crtsh,commoncrawl,waybackarchive   # somente estas fontes
 lunatic -d example.com --all                             # todas as fontes não desabilitadas
-lunatic -d example.com --json -o resultados.jsonl        # JSON Lines
+lunatic -d example.com --json -o resultados.jsonl        # JSON Lines (só domain e subdomain)
+lunatic -d example.com --json --show-sources             # JSON Lines com a lista de fontes por nome
+lunatic -d example.com -v                                # mostra o resumo por fonte (ok/skipped/failed)
 lunatic -d example.com --silent                          # só os resultados, ideal para pipes
 lunatic --list-sources                                   # tabela de fontes, status e variáveis
 lunatic --help
@@ -89,16 +99,17 @@ Valores padrão conforme `internal/cli/cli.go`.
 | `-dL arquivo` | Arquivo com um domínio por linha (`#` comenta) | - |
 | `-s lista` | Roda apenas estas fontes (nomes separados por vírgula) | fontes padrão |
 | `-es`, `--exclude-sources lista` | Pula estas fontes | nenhuma |
-| `--all` | Usa todas as fontes não desabilitadas (as sem chave aparecem como "skipped"). Não combina com `-s` | desligado |
+| `--all` | Usa todas as fontes não desabilitadas (as sem chave aparecem como "skipped" com `-v`). Não combina com `-s` | desligado |
 | `--list-sources` | Imprime a tabela de fontes e sai | - |
 | `-o arquivo` | **Também** grava os resultados no arquivo (criado/truncado, permissão 0644) | - |
 | `--json`, `-oJ` | Saída JSON Lines | texto |
-| `--silent` | Só resultados no stdout; sem banner, avisos, logs verbosos nem resumo | desligado |
+| `--show-sources` | Com `--json`, inclui o array `sources` em cada registro (o texto sempre traz só os nomes) | desligado |
+| `--silent` | Só resultados no stdout; também esconde o banner (e ignora `-v`) | desligado |
 | `--config caminho` | Arquivo YAML de credenciais | `$XDG_CONFIG_HOME/lunatic/config.yaml` ou `~/.config/lunatic/config.yaml` |
 | `--timeout segundos` | Tempo limite **por fonte** e por domínio (mínimo 1) | `90` (segundos) |
 | `--max-time minutos` | Tempo limite total da execução; `0` = sem limite | `10` (minutos) |
 | `--concurrency n` | Fontes rodando ao mesmo tempo (mínimo 1) | `10` |
-| `-v`, `--verbose` | Logs detalhados no stderr (segredos redigidos) | desligado |
+| `-v`, `--verbose` | Mostra progresso, avisos de configuração e o resumo por fonte (ok/skipped/failed com motivos) no stderr; segredos redigidos. Sem `-v` o stderr mostra só o banner | desligado |
 | `--no-color` | Desativa cores (também: `NO_COLOR`, `TERM=dumb`, stderr fora de TTY) | cores automáticas |
 | `--version` | Imprime a versão e sai | - |
 | `-h`, `--help` | Mostra a ajuda | - |
@@ -157,7 +168,7 @@ O que roda em cada modo (a lista completa e o estado real ficam em `lunatic --li
   - **Chave opcional** (rodam sem ela; a chave amplia a cota): alienvault, certspotter, hackertarget, submd, urlscan.
   - **Com chave obrigatória**: entram na execução padrão **somente se a chave estiver configurada**; sem ela aparecem como "needs key" e são puladas.
 - **Não-padrão** (só com `-s nome` ou `--all`): commoncrawl, digitorus, rapiddns, sitedossier (gratuitas, mas pesadas, instáveis ou baseadas em raspagem de HTML), e threatbook e zoomeyeapi (exigem chave).
-- **`--all`**: todas as fontes não desabilitadas. As que precisam de chave e não a têm aparecem como `skipped (missing credentials: ...)` no resumo.
+- **`--all`**: todas as fontes não desabilitadas. As que precisam de chave e não a têm aparecem como `skipped (missing credentials: ...)` no resumo do `-v`.
 - **Desabilitadas** (binaryedge, censys, chinaz, domainsproject, hudsonrock, robtex, threatcrowd): registradas para cobertura, nunca contatam a rede, mesmo com `-s`. Motivos em [docs/SOURCES.md](docs/SOURCES.md).
 
 Detalhes por fonte (endpoint, plano, limitações, situação de verificação): **[docs/SOURCES.md](docs/SOURCES.md)**.
@@ -173,11 +184,17 @@ api.example.com
 www.example.com
 ```
 
-**JSON Lines (`--json`)**: um objeto por linha, com `domain`, `subdomain` e a lista `sources` que observaram o nome.
+**JSON Lines (`--json`)**: um objeto por linha, apenas com `domain` e `subdomain` (sem nomes de fontes).
+
+```json
+{"domain":"example.com","subdomain":"api.example.com"}
+{"domain":"example.com","subdomain":"www.example.com"}
+```
+
+Com `--json --show-sources`, cada registro ganha o array `sources` com as fontes que observaram o nome (a saída de texto nunca inclui fontes):
 
 ```json
 {"domain":"example.com","subdomain":"api.example.com","sources":["crtsh","waybackarchive"]}
-{"domain":"example.com","subdomain":"www.example.com","sources":["alienvault","crtsh"]}
 ```
 
 ## stdout e stderr
@@ -185,9 +202,9 @@ www.example.com
 | Fluxo | Conteúdo |
 |---|---|
 | stdout | Apenas os resultados (dados) |
-| stderr | Banner (só se stderr for um terminal), avisos, logs `-v`, resumo por fonte e erros |
+| stderr | Só o banner (apenas se stderr for um terminal) e erros fatais de uso/configuração. Nenhum nome de fonte, falha, aviso ou contagem aparece por padrão; com `-v` surgem o progresso, os avisos e o resumo por fonte |
 
-Com `--silent`, o stderr só recebe erros fatais. Assim `lunatic ... > saida.txt` e `| outro-programa` recebem só dados.
+Com `--silent`, o stderr só recebe erros fatais (sem banner). Assim `lunatic ... > saida.txt` e `| outro-programa` recebem só dados.
 
 ## Códigos de saída
 
@@ -201,12 +218,14 @@ Com `--silent`, o stderr só recebe erros fatais. Assim `lunatic ... > saida.txt
 
 Fontes **puladas** (sem chave, desabilitadas) não contam como falha para o código `3`.
 
+A saída é limpa por padrão (nada sobre fontes no stderr), então o **código de saída** é o sinal de que alguma fonte falhou (`3` parcial, `2` nenhuma teve sucesso). Rode com `-v` para ver quais.
+
 ## Interpretando falhas, resultados vazios e registros históricos
 
-O resumo (stderr) lista cada fonte como `ok N`, `skipped (motivo)` ou `failed (tipo): mensagem`. Tipos de falha: `no_key`, `auth` (chave inválida ou plano sem acesso), `rate_limited` (cota/limite de taxa), `timeout`, `unexpected` (resposta em formato inesperado, provedor mudou), `unavailable` (5xx, desafio anti-bot), `blocked` (guarda passiva), `canceled`.
+Por padrão o Lunatic não imprime nada sobre fontes. Para saber quais fontes falharam, foram puladas ou funcionaram, **use `-v`**: o resumo (stderr) lista cada fonte como `ok N`, `skipped (motivo)` ou `failed (tipo): mensagem`. Tipos de falha: `no_key`, `auth` (chave inválida ou plano sem acesso), `rate_limited` (cota/limite de taxa), `timeout`, `unexpected` (resposta em formato inesperado, provedor mudou), `unavailable` (5xx, desafio anti-bot), `blocked` (guarda passiva), `canceled`.
 
 - **Resultado vazio não é erro.** Um domínio pequeno pode simplesmente não aparecer nas fontes.
-- **Falha parcial (código 3)** é comum: fontes gratuitas como crt.sh oscilam. Rode de novo, aumente `--timeout`, ou use `-v` para ver detalhes.
+- **Falha parcial (código 3)** é comum: fontes gratuitas como crt.sh oscilam. Rode de novo com `-v` para ver quais fontes falharam e por quê, e aumente `--timeout` se necessário.
 - **`auth`** costuma indicar chave inválida ou plano que não inclui o endpoint. **`unexpected`** pode indicar que o provedor mudou o formato: veja a seção de contribuição para reportar.
 - **Nomes históricos**: CT e arquivos web guardam registros antigos. Um nome listado pode ter sido desativado anos atrás.
 - Serviços limitam a cota gratuita e podem truncar resultados sem avisar (ver [docs/SOURCES.md](docs/SOURCES.md)).

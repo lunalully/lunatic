@@ -3,6 +3,7 @@ package banner
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/lunalully/lunatic/internal/term"
 )
@@ -12,39 +13,70 @@ func TestRenderPlain(t *testing.T) {
 	if strings.Contains(s, "\x1b") {
 		t.Fatal("ANSI in plain banner")
 	}
-	if !strings.Contains(s, "Passive Subdomain Recon") || !strings.Contains(s, "v1.2.3") {
+	if !strings.Contains(s, "Passive Subdomain Recon  v1.2.3") {
 		t.Fatal(s)
 	}
+	lines := strings.Split(strings.Trim(s, "\n"), "\n")
+	if len(lines) != len(Star) {
+		t.Fatalf("rows: got %d want %d", len(lines), len(Star))
+	}
 	for _, l := range strings.Split(s, "\n") {
-		if len(l) > 80 {
-			t.Fatalf("line too wide (%d): %q", len(l), l)
+		if n := utf8.RuneCountInString(l); n > 80 {
+			t.Fatalf("line too wide (%d): %q", n, l)
 		}
 	}
-	if len(Art) != 6 {
-		t.Fatal("art rows")
+}
+
+func TestWordPixels(t *testing.T) {
+	if len(Word) != 7 {
+		t.Fatalf("word rows: %d", len(Word))
 	}
-	if !strings.Contains(s, "* Passive Subdomain Recon *") {
-		t.Fatal("tagline")
-	}
-	var n int
-	for _, l := range Art {
-		for _, c := range l {
-			switch c {
-			case '/', '\\', '*':
-				n++
-			case ' ':
-			default:
-				t.Fatalf("unexpected char %q in art", c)
+	for _, r := range Word {
+		if n := utf8.RuneCountInString(r); n != 7*5+6 {
+			t.Fatalf("word width %d: %q", n, r)
+		}
+		for _, c := range r {
+			if c != ' ' && c != '\u2593' {
+				t.Fatalf("unexpected char %q in word", c)
 			}
 		}
 	}
-	if n == 0 {
-		t.Fatal("empty art")
+	if !strings.Contains(strings.Join(Word, ""), "\u2593") {
+		t.Fatal("empty word")
 	}
-	w := len(Art[0])
-	for _, l := range Art {
-		if len(l) != w {
-			t.Errorf("ragged art row: %q", l)
+}
+
+func TestStarOnlyLunaticLetters(t *testing.T) {
+	if len(Star) < 15 || len(Star) > 17 {
+		t.Fatalf("star rows: %d", len(Star))
+	}
+	var seq []rune
+	for _, r := range Star {
+		if utf8.RuneCountInString(r) > 32 {
+			t.Fatalf("star too wide: %q", r)
+		}
+		for _, c := range r {
+			if c != ' ' && !strings.ContainsRune("lunatic", c) {
+				t.Fatalf("unexpected char %q in star", c)
+			}
+			if c != ' ' {
+				seq = append(seq, c)
+			}
+		}
+	}
+	for i, c := range seq {
+		if c != rune("lunatic"[i%7]) {
+			t.Fatalf("letters not cycled in order at %d: %q", i, c)
+		}
+	}
+}
+
+func TestRenderAllowedChars(t *testing.T) {
+	s := Render("1.2.3", term.None)
+	s = strings.Replace(s, "Passive Subdomain Recon  v1.2.3", "", 1)
+	for _, c := range s {
+		if c != '\n' && c != ' ' && c != '\u2593' && !strings.ContainsRune("lunatic", c) {
+			t.Fatalf("unexpected char %q in banner", c)
 		}
 	}
 }

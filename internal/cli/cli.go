@@ -8,9 +8,12 @@
 //	3    partial success: at least one source succeeded and at least one failed
 //	130  interrupted (SIGINT/SIGTERM); partial results are still written
 //
-// Streams: results go to stdout only (data, never ANSI). The banner, warnings,
-// verbose logs and the summary go to stderr. --silent suppresses the banner,
-// warnings, verbose logs and the summary; only fatal errors reach stderr.
+// Streams: results go to stdout only (data, never ANSI). By default stderr
+// carries only the banner (interactive terminals only) and fatal usage/config
+// errors: no source names, failures, warnings or counts. Those (per-source
+// summary, config warnings, progress) appear only with -v/--verbose. The exit
+// code still signals source failures. --silent also suppresses the banner and
+// verbose output; only fatal errors reach stderr.
 package cli
 
 import (
@@ -83,10 +86,10 @@ func (l *listFlag) Set(v string) error {
 }
 
 type options struct {
-	domains, srcs, exclude                                   listFlag
-	dList, outFile, cfgPath                                  string
-	all, json, silent, list, verbose, noColor, version, help bool
-	timeout, maxTime, concurrency                            int
+	domains, srcs, exclude                                                listFlag
+	dList, outFile, cfgPath                                               string
+	all, json, showSources, silent, list, verbose, noColor, version, help bool
+	timeout, maxTime, concurrency                                         int
 }
 
 const helpText = `lunatic - passive subdomain recon
@@ -108,8 +111,9 @@ Sources:
 
 Output:
   -o file                 also write results to file (created/truncated); results always go to stdout
-  --json, -oJ             JSON Lines output: {"domain","subdomain","sources"}
-  --silent                only results on stdout; no banner, warnings, verbose logs or summary
+  --json, -oJ             JSON Lines output: {"domain","subdomain"}
+  --show-sources          with --json, add the "sources" array to each record (TXT is always names only)
+  --silent                only results on stdout; also hides the banner (and ignores -v)
 
 Runtime:
   --config path           YAML config with API keys (default: $XDG_CONFIG_HOME/lunatic/config.yaml
@@ -117,12 +121,13 @@ Runtime:
   --timeout seconds       per-source timeout for each domain (default 90)
   --max-time minutes      overall time limit, 0 = none (default 10)
   --concurrency n         sources running at once (default 10)
-  -v, --verbose           verbose logs to stderr (secrets redacted)
+  -v, --verbose           show progress, config warnings and the per-source summary (ok/skipped/failed
+                          with reasons) on stderr; secrets redacted. Without it stderr shows only the banner
   --no-color              disable colors (also: NO_COLOR env, TERM=dumb, non-TTY stderr)
   --version               print version and exit
   -h, --help              show this help
 
-Exit codes:
+Exit codes (they signal source failures even though stderr stays quiet; use -v to see which):
   0 all attempted sources succeeded   1 usage/input/config error
   2 no source succeeded               3 partial success (some sources failed)
   130 interrupted
@@ -140,6 +145,7 @@ func newFlagSet(o *options) *flag.FlagSet {
 	fs.BoolVar(&o.all, "all", false, "")
 	fs.BoolVar(&o.json, "json", false, "")
 	fs.BoolVar(&o.json, "oJ", false, "")
+	fs.BoolVar(&o.showSources, "show-sources", false, "")
 	fs.BoolVar(&o.silent, "silent", false, "")
 	fs.BoolVar(&o.list, "list-sources", false, "")
 	fs.StringVar(&o.cfgPath, "config", "", "")
@@ -201,7 +207,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer, e env) in
 		return fail("%v", err)
 	}
 	lvl := term.ColorLevel(e.lookupEnv, e.stderrTTY, o.noColor)
-	if !o.silent {
+	if o.verbose && !o.silent {
 		for _, w := range warns {
 			fmt.Fprintln(stderr, term.Paint(lvl, "yellow", "warning: "+w))
 		}
@@ -359,7 +365,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer, e env) in
 
 	write := output.WriteTXT
 	if o.json {
-		write = output.WriteJSONL
+		write = func(w io.Writer, f []runner.Finding) error { return output.WriteJSONL(w, f, o.showSources) }
 	}
 	code := ExitOK
 	if err := write(stdout, res.Findings); err != nil {
@@ -372,7 +378,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer, e env) in
 			code = ExitUsage
 		}
 	}
-	if !o.silent {
+	if o.verbose && !o.silent {
 		printSummary(stderr, res, len(domains), lvl)
 	}
 
@@ -385,7 +391,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer, e env) in
 	s := res.Summary()
 	switch {
 	case s.OK == 0:
-		if o.silent {
+		if o.verbose && !o.silent {
 			fmt.Fprintln(stderr, "lunatic: no source succeeded")
 		}
 		return ExitNoSuccess

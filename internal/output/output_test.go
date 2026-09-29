@@ -33,7 +33,16 @@ func TestTXT(t *testing.T) {
 
 func TestJSONL(t *testing.T) {
 	var b bytes.Buffer
-	if err := WriteJSONL(&b, sample[:2]); err != nil {
+	if err := WriteJSONL(&b, sample[:2], false); err != nil {
+		t.Fatal(err)
+	}
+	plain := `{"domain":"example.com","subdomain":"api.example.com"}` + "\n" +
+		`{"domain":"example.com","subdomain":"www.example.com"}` + "\n"
+	if b.String() != plain {
+		t.Fatalf("default JSONL must not carry sources: %q", b.String())
+	}
+	b.Reset()
+	if err := WriteJSONL(&b, sample[:2], true); err != nil {
 		t.Fatal(err)
 	}
 	want := `{"domain":"example.com","subdomain":"api.example.com","sources":["crtsh","waybackarchive"]}` + "\n" +

@@ -73,7 +73,7 @@ Mantenha o código simples, sem dependências novas sem discussão prévia (o pr
 Provedores mudam de formato, cota e endpoint. Ao abrir uma issue:
 
 1. Rode com `-v` e uma única fonte: `lunatic -d example.com -s <fonte> -v` (segredos são redigidos, mas confira).
-2. Informe: nome da fonte, versão (`lunatic --version`), tipo da falha no resumo (`auth`, `rate_limited`, `unexpected`, `unavailable`...) e o código de saída.
+2. Informe: nome da fonte, versão (`lunatic --version`), tipo da falha no resumo do `-v` (`auth`, `rate_limited`, `unexpected`, `unavailable`...) e o código de saída.
 3. Se possível, descreva o formato novo da resposta com um **exemplo anonimizado** (sem chaves, sem dados pessoais).
 4. Diga se o plano da sua chave inclui o endpoint.
 

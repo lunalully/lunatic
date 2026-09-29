@@ -22,7 +22,7 @@ Isso é uma **inferência não confirmada**. A situação que vale é a coluna "
 | implementada padrão | Roda na execução padrão (sem `-s`/`--all`). Se aceita chave opcional, funciona sem ela. |
 | implementada com chave | Exige credencial. Entra na execução padrão **somente** se a credencial estiver configurada; sem ela aparece como "needs key" e é pulada. |
 | implementada não-padrão | Não roda por padrão (`Default: false`). Use `-s nome` ou `--all`. Se também exigir chave (threatbook, zoomeyeapi), `--all` a pula quando faltar credencial. |
-| desabilitada | Registrada só para listagem/cobertura; nunca contata a rede. Ignorada por `--all`; `-s nome` a lista como `skipped (motivo)` no resumo. |
+| desabilitada | Registrada só para listagem/cobertura; nunca contata a rede. Ignorada por `--all`; `-s nome` a lista como `skipped (motivo)` no resumo do `-v`. |
 
 Verificação: **fixture ✓** = teste offline passa; **ao vivo ✗** = não confirmado contra o provedor real.
 
