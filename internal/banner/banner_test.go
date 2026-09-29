@@ -47,12 +47,12 @@ func TestWordPixels(t *testing.T) {
 }
 
 func TestStarOnlyLunaticLetters(t *testing.T) {
-	if len(Star) < 11 || len(Star) > 12 {
+	if len(Star) < 13 || len(Star) > 14 {
 		t.Fatalf("star rows: %d", len(Star))
 	}
 	var seq []rune
 	for _, r := range Star {
-		if utf8.RuneCountInString(r) > 27 {
+		if utf8.RuneCountInString(r) > 31 {
 			t.Fatalf("star too wide: %q", r)
 		}
 		for _, c := range r {
@@ -72,7 +72,7 @@ func TestStarOnlyLunaticLetters(t *testing.T) {
 }
 
 func TestStarSymmetric(t *testing.T) {
-	const w = 27
+	const w = 31
 	for i, r := range Star {
 		rs := []rune(r)
 		for len(rs) < w {

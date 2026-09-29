@@ -1,18 +1,22 @@
 # Lunatic
 
 ```
-                                                           lun
-  ▓     ▓   ▓ ▓   ▓  ▓▓▓  ▓▓▓▓▓ ▓▓▓▓▓  ▓▓▓▓               aticl
-  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                  unaticl
-  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                 unat iclu
-  ▓     ▓   ▓ ▓ ▓ ▓ ▓▓▓▓▓   ▓     ▓   ▓        naticlunatic   lunaticlunat
-  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓        icluna               ticlun
-  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓           aticl           unati
-  ▓▓▓▓▓  ▓▓▓  ▓   ▓ ▓   ▓   ▓   ▓▓▓▓▓  ▓▓▓▓          clun       atic
-                                                     lun    a    tic
-                                                     lun aticlun ati
-  Passive Subdomain Recon  v0.1.0                   clunati   clunati
-                                                   clunat       icluna
+
+                                                              l
+                                                             una
+  ▓     ▓   ▓ ▓   ▓  ▓▓▓  ▓▓▓▓▓ ▓▓▓▓▓  ▓▓▓▓                 ti cl
+  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                     un at
+  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                    ic   lu
+  ▓     ▓   ▓ ▓ ▓ ▓ ▓▓▓▓▓   ▓     ▓   ▓        naticlunaticl     unaticlunatic
+  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓         luna                     ticl
+  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓            unat               iclu
+  ▓▓▓▓▓  ▓▓▓  ▓   ▓ ▓   ▓   ▓   ▓▓▓▓▓  ▓▓▓▓           nat           icl
+                                                        un         at
+                                                       ic     l     un
+  Passive Subdomain Recon  v1.0.0                     at   iclunat   ic
+                                                      lunati     clunat
+                                                     iclu           nati
+
 ```
 
 **Lunatic** é uma ferramenta de código aberto, escrita em Go, para descoberta de subdomínios **estritamente passiva**. Ela consulta apenas provedores de dados de terceiros (logs de Certificate Transparency, arquivos web, bases de DNS passivo, mecanismos de busca de ativos etc.). Ela **nunca** faz varredura, força bruta, resolução de DNS ou requisição HTTP ao alvo.
