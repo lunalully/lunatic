@@ -2,20 +2,21 @@
 
 ```
 
-                                                              l
-                                                             una
-  ▓     ▓   ▓ ▓   ▓  ▓▓▓  ▓▓▓▓▓ ▓▓▓▓▓  ▓▓▓▓                 ti cl
-  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                     un at
-  ▓     ▓   ▓ ▓▓  ▓ ▓   ▓   ▓     ▓   ▓                    ic   lu
-  ▓     ▓   ▓ ▓ ▓ ▓ ▓▓▓▓▓   ▓     ▓   ▓        naticlunaticl     unaticlunatic
-  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓         luna                     ticl
-  ▓     ▓   ▓ ▓  ▓▓ ▓   ▓   ▓     ▓   ▓            unat               iclu
-  ▓▓▓▓▓  ▓▓▓  ▓   ▓ ▓   ▓   ▓   ▓▓▓▓▓  ▓▓▓▓           nat           icl
-                                                        un         at
-                                                       ic     l     un
-  Passive Subdomain Recon  v1.0.0                     at   iclunat   ic
-                                                      lunati     clunat
-                                                     iclu           nati
+                                                          _..._
+  .---.                                                .-'_..._''.
+  |   |              _..._                     .--.  .' .'      '.\
+  |   |            .'     '.                   |__| / .'
+  |   |           .   .-.   .              .|  .--.. '
+  |   |           |  '   '  |    __      .' |_ |  || |
+  |   |   _    _  |  |   |  | .:--.'.  .'     ||  || |                 ___    A
+  |   |  | '  / | |  |   |  |/ |   \ |'--.  .-'|  |. '                 | |   {*}
+  |   | .' | .' | |  |   |  |`" __ | |   |  |  |  | \ '.          .    | |  __V__
+  |   | /  | /  | |  |   |  | .'.''| |   |  |  |__|  '. `._____.-'/    |_|o_|%%%|0_
+  '---'|   ''.  | |  |   |  |/ /   | |_  |  '.'        `-.______ /        |       |
+       '   .'|  '/|  |   |  |\ \._.\ '/  |   /                  '         |       |
+        `-'  `--' '--'   '--' '--'  `"   `'-'                             |_______|
+
+  Passive Subdomain Recon  v1.0.0
 
 ```
 
@@ -270,6 +271,8 @@ Nesta build **não foi possível testar contra os provedores reais**: o ambiente
 ## Licença
 
 MIT. Veja [LICENSE](LICENSE). Copyright (c) 2026 Lunatic contributors.
+
+O banner (wordmark e desenho) é arte ASCII enviada pela autora do projeto; não usa fonte FIGlet nem código de terceiros.
 
 **Avisos de terceiros (NOTICE):**
 

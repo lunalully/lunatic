@@ -1,6 +1,7 @@
 package banner
 
 import (
+	"os"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -8,90 +9,76 @@ import (
 	"github.com/lunalully/lunatic/internal/term"
 )
 
-func TestRenderPlain(t *testing.T) {
-	s := Render("1.2.3", term.None)
-	if strings.Contains(s, "\x1b") {
-		t.Fatal("ANSI in plain banner")
+// wantArt is the drawing exactly as supplied by the author.
+var wantArt = []string{
+	"___    A",
+	"| |   {*}",
+	"| |  __V__",
+	"|_|o_|%%%|0_",
+	"   |       |",
+	"   |       |",
+	"   |_______|",
+}
+
+func TestArtExact(t *testing.T) {
+	got := ArtLines()
+	if len(got) != len(wantArt) {
+		t.Fatalf("art rows: got %d want %d", len(got), len(wantArt))
 	}
-	if !strings.Contains(s, "Passive Subdomain Recon  v1.2.3") {
-		t.Fatal(s)
-	}
-	lines := strings.Split(strings.Trim(s, "\n"), "\n")
-	if len(lines) != len(Star) {
-		t.Fatalf("rows: got %d want %d", len(lines), len(Star))
-	}
-	for _, l := range strings.Split(s, "\n") {
-		if n := utf8.RuneCountInString(l); n > 80 {
-			t.Fatalf("line too wide (%d): %q", n, l)
+	for i := range wantArt {
+		if got[i] != wantArt[i] {
+			t.Errorf("art row %d: got %q want %q", i, got[i], wantArt[i])
 		}
 	}
 }
 
-func TestWordPixels(t *testing.T) {
-	if len(Word) != 7 {
+func TestWordShape(t *testing.T) {
+	if len(Word) != 13 {
 		t.Fatalf("word rows: %d", len(Word))
 	}
+	if w := width(Word); w != 65 {
+		t.Fatalf("word width %d", w)
+	}
 	for _, r := range Word {
-		if n := utf8.RuneCountInString(r); n != 7*5+6 {
-			t.Fatalf("word width %d: %q", n, r)
-		}
 		for _, c := range r {
-			if c != ' ' && c != '\u2593' {
+			if !strings.ContainsRune(" |.-'`/\\_,:\"", c) {
 				t.Fatalf("unexpected char %q in word", c)
 			}
 		}
 	}
-	if !strings.Contains(strings.Join(Word, ""), "\u2593") {
-		t.Fatal("empty word")
-	}
 }
 
-func TestStarOnlyLunaticLetters(t *testing.T) {
-	if len(Star) < 13 || len(Star) > 14 {
-		t.Fatalf("star rows: %d", len(Star))
+func TestRenderGolden(t *testing.T) {
+	want, err := os.ReadFile("testdata/banner.golden")
+	if err != nil {
+		t.Fatal(err)
 	}
-	var seq []rune
-	for _, r := range Star {
-		if utf8.RuneCountInString(r) > 31 {
-			t.Fatalf("star too wide: %q", r)
-		}
-		for _, c := range r {
-			if c != ' ' && !strings.ContainsRune("lunatic", c) {
-				t.Fatalf("unexpected char %q in star", c)
-			}
-			if c != ' ' {
-				seq = append(seq, c)
-			}
-		}
+	got := Render("1.2.3", term.None)
+	if got != string(want) {
+		t.Fatalf("banner differs from testdata/banner.golden:\n%s", got)
 	}
-	for i, c := range seq {
-		if c != rune("lunatic"[i%7]) {
-			t.Fatalf("letters not cycled in order at %d: %q", i, c)
+	if strings.Contains(got, "\x1b") {
+		t.Fatal("ANSI in plain banner")
+	}
+	lines := strings.Split(strings.TrimRight(got, "\n"), "\n")
+	if len(lines) != 1+len(Word)+2 { // blank + word + blank + tagline
+		t.Fatalf("rows: %d", len(lines))
+	}
+	for _, l := range lines {
+		if n := utf8.RuneCountInString(l); n > 100 {
+			t.Fatalf("line too wide (%d): %q", n, l)
 		}
 	}
-}
-
-func TestStarSymmetric(t *testing.T) {
-	const w = 31
-	for i, r := range Star {
-		rs := []rune(r)
-		for len(rs) < w {
-			rs = append(rs, ' ')
-		}
-		for x := 0; x < w/2; x++ {
-			if (rs[x] == ' ') != (rs[w-1-x] == ' ') {
-				t.Fatalf("row %d not symmetric: %q", i, r)
-			}
-		}
+	if !strings.Contains(got, "Passive Subdomain Recon  v1.2.3") {
+		t.Fatal("tagline missing")
 	}
-}
-
-func TestRenderAllowedChars(t *testing.T) {
-	s := Render("1.2.3", term.None)
-	s = strings.Replace(s, "Passive Subdomain Recon  v1.2.3", "", 1)
-	for _, c := range s {
-		if c != '\n' && c != ' ' && c != '\u2593' && !strings.ContainsRune("lunatic", c) {
-			t.Fatalf("unexpected char %q in banner", c)
+	// the drawing sits 4 columns right of the wordmark, bottom aligned
+	off := len(Word) - len(wantArt)
+	for j, a := range wantArt {
+		l := lines[1+off+j]
+		want := strings.TrimRight("  "+pad(Word[off+j], width(Word))+"    "+a, " ")
+		if l != want {
+			t.Errorf("row %d: got %q want %q", off+j, l, want)
 		}
 	}
 }
