@@ -1,5 +1,7 @@
 # Lunatic
 
+![Banner do Lunatic: o wordmark "Lunatic" em arte ASCII laranja sobre fundo preto, com "Passive Subdomain Recon v0.1.0" abaixo](docs/banner.png)
+
 ```
 
                                                           _..._
@@ -49,7 +51,7 @@ go version    # confira se é 1.24 ou superior; se for mais antigo, use o go.dev
 Baixe o código e compile:
 
 ```bash
-git clone <URL do seu repositório> lunatic
+git clone https://github.com/lunalully/lunatic.git lunatic
 cd lunatic
 
 make build        # gera ./bin/lunatic
