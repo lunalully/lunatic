@@ -81,4 +81,4 @@ Nunca inclua sua chave na issue.
 
 ## Licença
 
-Ao contribuir, você concorda que sua contribuição será licenciada sob a licença MIT do projeto ([LICENSE](LICENSE)). Não copie código de outros projetos sem verificar a licença e atribuir adequadamente; o Subfinder, por exemplo, serve aqui apenas como referência de endpoints, sem cópia de código.
+Ao contribuir, você concorda que sua contribuição será licenciada sob a licença MIT do projeto ([LICENSE](LICENSE)).
