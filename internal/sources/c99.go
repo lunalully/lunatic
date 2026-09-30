@@ -4,8 +4,8 @@
 // Endpoint: GET /subdomainfinder?key=..&domain=..&json  (stored-data finder only;
 // the vendor's realtime/scan option is NEVER sent). Auth: required, `key` query
 // parameter (httpx redacts configured secrets). Paid key.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

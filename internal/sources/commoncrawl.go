@@ -7,8 +7,8 @@
 // provider (HTTP 503 = slow down) so it is not in the default run.
 // A 404 "No Captures found" for an index means zero results for that index.
 // Pagination per index is bounded by Session.MaxPages.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

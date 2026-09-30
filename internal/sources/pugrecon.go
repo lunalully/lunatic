@@ -3,7 +3,7 @@
 // Provider: PugRecon. Docs: https://gist.github.com/c3l3si4n/68ac06ebe85f8c0b821800432c7f89a6
 // Endpoint: POST https://pugrecon.com/api/v1/domains body {"domain_name":"<d>"} (indexed data; no pagination).
 // Auth: "Authorization: Bearer <api_key>". Free quota is tiny (conflicting docs).
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

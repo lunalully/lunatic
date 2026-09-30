@@ -4,8 +4,8 @@
 // Endpoints (indexed data only): GET https://app.netlas.io/api/domains_count/?q=...
 // then POST https://app.netlas.io/api/domains/download/ with {"q","fields","source_type","size"}.
 // Auth: "Authorization: Bearer <api_key>". Community plan is free but small
-// (research: 50 requests/day, download up to 200 results), hence netlasMaxSize.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// (documented: 50 requests/day, download up to 200 results), hence netlasMaxSize.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 // The download request body follows the Subfinder reference and is not confirmed in the official docs.
 package sources
 
@@ -19,7 +19,7 @@ import (
 
 var netlasBaseURL = "https://app.netlas.io"
 
-// netlasMaxSize caps the download size (free-tier limit per the research).
+// netlasMaxSize caps the download size (free-tier limit per the docs).
 var netlasMaxSize = 200
 
 type netlas struct{}

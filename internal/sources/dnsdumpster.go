@@ -7,7 +7,7 @@
 // banner/geo data are dropped. Only the first page is requested: the paging response shape is not documented.
 // Passive nature: the docs do not state explicitly whether lookups are served from stored data (unconfirmed).
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (
@@ -30,6 +30,9 @@ func (dnsdumpster) Info() Info {
 
 type dnsdumpsterRec struct {
 	Host string `json:"host"`
+	IPs  []struct {
+		IP string `json:"ip"`
+	} `json:"ips"`
 }
 
 func (dnsdumpster) Enumerate(ctx context.Context, domain string, s *Session, emit func(string)) error {
@@ -62,6 +65,9 @@ func (dnsdumpster) Enumerate(ctx context.Context, domain string, s *Session, emi
 		for _, r := range set {
 			if r.Host != "" {
 				emit(strings.TrimSuffix(r.Host, "."))
+			}
+			for _, a := range r.IPs {
+				s.IP(a.IP)
 			}
 		}
 	}

@@ -5,8 +5,8 @@
 // treat failures as soft. The exact result string format is not confirmed, so
 // hostnames are extracted defensively from every FDNS_A/RDNS/Results entry and
 // IPs, hashes and organisation names are dropped.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (
@@ -61,6 +61,14 @@ func (bufferover) Enumerate(ctx context.Context, domain string, s *Session, emit
 	}
 	if len(r.FDNSA)+len(r.RDNS)+len(r.Results) == 0 && r.Message != "" {
 		return bufferoverProviderErr(r.Message)
+	}
+	for _, e := range r.FDNSA { // FDNS_A rows look like "ip,host"
+		var row string
+		if json.Unmarshal(e, &row) == nil {
+			if ip, _, ok := strings.Cut(row, ","); ok {
+				s.IP(ip)
+			}
+		}
 	}
 	for _, list := range [][]json.RawMessage{r.FDNSA, r.RDNS, r.Results} {
 		for _, e := range list {

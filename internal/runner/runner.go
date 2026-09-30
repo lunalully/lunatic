@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/netip"
 	"sort"
 	"strings"
 	"sync"
@@ -120,6 +121,59 @@ func SkipReason(info sources.Info, creds map[string]string) string {
 type collector struct {
 	mu   sync.Mutex
 	prov map[string]map[string]map[string]bool // domain -> sub -> sources
+	ips  map[string]map[string]bool            // domain -> unique public IPs reported by phase 1
+}
+
+// addIP records a public address for domain; private/reserved ones are dropped.
+func (c *collector) addIP(domain, raw string) {
+	addr, err := netip.ParseAddr(strings.TrimSpace(raw))
+	if err != nil {
+		return
+	}
+	addr = addr.Unmap()
+	if !addr.IsValid() || !addr.IsGlobalUnicast() || addr.IsPrivate() || addr.IsLoopback() || addr.IsLinkLocalUnicast() ||
+		isReserved(addr) {
+		return
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.ips[domain] == nil {
+		c.ips[domain] = map[string]bool{}
+	}
+	c.ips[domain][addr.String()] = true
+}
+
+// ipList returns the sorted collected IPs for domain.
+func (c *collector) ipList(domain string) []string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	out := make([]string, 0, len(c.ips[domain]))
+	for ip := range c.ips[domain] {
+		out = append(out, ip)
+	}
+	sort.Strings(out)
+	return out
+}
+
+var reservedPrefixes = func() []netip.Prefix {
+	var out []netip.Prefix
+	for _, s := range []string{
+		"0.0.0.0/8", "100.64.0.0/10", "192.0.0.0/24", "192.0.2.0/24", "198.18.0.0/15",
+		"198.51.100.0/24", "203.0.113.0/24", "240.0.0.0/4",
+		"2001:db8::/32", "fc00::/7", "64:ff9b::/96", "100::/64",
+	} {
+		out = append(out, netip.MustParsePrefix(s))
+	}
+	return out
+}()
+
+func isReserved(a netip.Addr) bool {
+	for _, p := range reservedPrefixes {
+		if p.Contains(a) {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *collector) add(domain, sub, source string) bool {
@@ -140,6 +194,33 @@ func (c *collector) add(domain, sub, source string) bool {
 	return fresh
 }
 
+func runPhase(ctx context.Context, domains []string, tasks []Task, idx []int, outcomes []Outcome, opts Options, col *collector) {
+	jobs := make(chan int)
+	var wg sync.WaitGroup
+	for w := 0; w < opts.Concurrency; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range jobs {
+				outcomes[i] = runOne(ctx, domains, tasks[i], opts, col)
+			}
+		}()
+	}
+	for _, i := range idx {
+		if reason := SkipReason(tasks[i].Source.Info(), tasks[i].Creds); reason != "" {
+			outcomes[i] = Outcome{Source: tasks[i].Source.Info().Name, Status: StatusSkipped, Message: reason}
+			continue
+		}
+		select {
+		case jobs <- i:
+		case <-ctx.Done():
+			outcomes[i] = Outcome{Source: tasks[i].Source.Info().Name, Status: StatusFailed, Kind: "canceled", Message: "not started: canceled"}
+		}
+	}
+	close(jobs)
+	wg.Wait()
+}
+
 // Run executes tasks against domains (canonical, see scope.ParseDomain). It
 // always returns Results; interruption is visible as outcomes of kind
 // "canceled" and ctx.Err().
@@ -153,33 +234,20 @@ func Run(ctx context.Context, domains []string, tasks []Task, opts Options) *Res
 	if opts.MaxPages < 1 {
 		opts.MaxPages = 10
 	}
-	col := &collector{prov: map[string]map[string]map[string]bool{}}
+	col := &collector{prov: map[string]map[string]map[string]bool{}, ips: map[string]map[string]bool{}}
 	outcomes := make([]Outcome, len(tasks))
 
-	jobs := make(chan int)
-	var wg sync.WaitGroup
-	for w := 0; w < opts.Concurrency; w++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for i := range jobs {
-				outcomes[i] = runOne(ctx, domains, tasks[i], opts, col)
+	// Phase 1 runs every source without Phase2; phase 2 runs afterwards with
+	// the IPs phase 1 collected.
+	for phase := 1; phase <= 2; phase++ {
+		var idx []int
+		for i := range tasks {
+			if tasks[i].Source.Info().Phase2 == (phase == 2) {
+				idx = append(idx, i)
 			}
-		}()
-	}
-	for i := range tasks {
-		if reason := SkipReason(tasks[i].Source.Info(), tasks[i].Creds); reason != "" {
-			outcomes[i] = Outcome{Source: tasks[i].Source.Info().Name, Status: StatusSkipped, Message: reason}
-			continue
 		}
-		select {
-		case jobs <- i:
-		case <-ctx.Done():
-			outcomes[i] = Outcome{Source: tasks[i].Source.Info().Name, Status: StatusFailed, Kind: "canceled", Message: "not started: canceled"}
-		}
+		runPhase(ctx, domains, tasks, idx, outcomes, opts, col)
 	}
-	close(jobs)
-	wg.Wait()
 
 	res := &Results{Outcomes: outcomes}
 	sort.Slice(res.Outcomes, func(i, j int) bool { return res.Outcomes[i].Source < res.Outcomes[j].Source })
@@ -243,12 +311,28 @@ func runOne(ctx context.Context, domains []string, t Task, opts Options, col *co
 
 	own := map[string]bool{}
 	var firstErr error
+	var curMu sync.Mutex
+	cur := ""
+	if !info.Phase2 {
+		sess.ReportIP = func(ip string) {
+			curMu.Lock()
+			d := cur
+			curMu.Unlock()
+			col.addIP(d, ip)
+		}
+	}
 	for _, d := range domains {
 		if err := ctx.Err(); err != nil {
 			firstErr = err
 			break
 		}
 		domain := d
+		curMu.Lock()
+		cur = domain
+		curMu.Unlock()
+		if info.Phase2 {
+			sess.IPs = col.ipList(domain)
+		}
 		err := enumerate(ctx, opts.SourceTimeout, t.Source, domain, sess, func(raw string) {
 			if n, ok := scope.Normalize(raw, domain); ok {
 				col.add(domain, n, info.Name)

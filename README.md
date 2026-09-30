@@ -124,10 +124,11 @@ Nomes de fontes desconhecidos em `-s` ou `--exclude-sources` geram erro de uso (
 O que roda em cada modo (a lista completa e o estado atual saem em `lunatic --list-sources`):
 
 - Execução padrão (sem `-s` nem `--all`): fontes marcadas como padrão e utilizáveis.
-  - Gratuitas e sem chave: anubis, crtsh, scanmalware, shodanct, subdomaincenter, thc, waybackarchive.
+  - Gratuitas e sem chave: anubis, crtsh, scanmalware, shodanct, subdomaincenter, thc, threatminer, waybackarchive.
   - Chave opcional (rodam sem ela; a chave amplia a cota): alienvault, certspotter, hackertarget, submd, urlscan.
+  - Segunda fase: internetdb só consulta IPs que outras fontes já devolveram. Sem IPs coletados, não faz requisição nenhuma; nunca resolve DNS nem contata os hosts.
   - Chave obrigatória: entram na execução padrão só quando a chave está configurada; sem ela, aparecem como "needs key" e são puladas.
-- Fora do padrão (só com `-s nome` ou `--all`): commoncrawl, digitorus, rapiddns e sitedossier (gratuitas, mas pesadas, instáveis ou baseadas em raspagem de HTML), além de threatbook e zoomeyeapi, que exigem chave.
+- Fora do padrão (só com `-s nome` ou `--all`): arquivopt, commoncrawl, digitorus, rapiddns e sitedossier (gratuitas, mas pesadas, instáveis ou baseadas em raspagem de HTML), além de threatbook e zoomeyeapi, que exigem chave.
 - `--all`: todas as fontes não desabilitadas. As que precisam de chave e não têm aparecem como `skipped (missing credentials: ...)` no resumo do `-v`.
 - Desabilitadas (binaryedge, censys, chinaz, domainsproject, hudsonrock, robtex, threatcrowd): ficam registradas para cobertura, mas nunca contatam a rede, nem com `-s`. Os motivos estão em [docs/SOURCES.md](docs/SOURCES.md).
 
@@ -196,7 +197,7 @@ Por padrão o Lunatic não imprime nada sobre as fontes. Para ver o que acontece
 - Sem resolução de DNS dos resultados.
 - Sem HTTP para o alvo: todo acesso de rede passa por um único cliente (`internal/httpx`), que recusa qualquer requisição ao domínio-alvo ou aos subdomínios dele.
 - Redirecionamentos para o alvo são bloqueados; no máximo 3 saltos e só para o mesmo host (ou de http para https no mesmo host).
-- Nada de seguir links encontrados nos resultados nem disparar jobs/scans nos provedores. Só nomes são guardados (sem e-mails, IPs ou dados pessoais).
+- Nada de seguir links encontrados nos resultados nem disparar jobs/scans nos provedores. Só nomes saem nos resultados (sem e-mails, IPs ou dados pessoais); IPs devolvidos por uma fonte são apenas repassados às fontes de fase 2 e não ficam salvos.
 - Fontes de raspagem (digitorus, rapiddns, sitedossier) nunca contornam CAPTCHA ou desafios anti-bot.
 
 ## Integração com pipes
@@ -211,7 +212,7 @@ lunatic -d example.com --silent | sort -u > subs.txt
 
 ## Como adicionar e testar uma nova fonte (adaptador)
 
-Resumo; as regras completas estão em [AGENTS.md](AGENTS.md) e [CONTRIBUTING.md](CONTRIBUTING.md).
+Resumo; as regras completas estão em [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) e [CONTRIBUTING.md](CONTRIBUTING.md).
 
 1. Crie exatamente estes arquivos: `internal/sources/<nome>.go`, `internal/sources/<nome>_test.go` e fixtures em `internal/sources/testdata/<nome>/`.
 2. Declare a URL base como **variável de pacote** (os testes a reatribuem): `var nomeBaseURL = "https://api.exemplo.com"`.

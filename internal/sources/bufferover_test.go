@@ -119,3 +119,24 @@ func TestBufferoverInfo(t *testing.T) {
 		t.Fatalf("%+v", i)
 	}
 }
+
+func TestBufferoverReportsIPs(t *testing.T) {
+	srv := httptest.NewServer(bufferoverBody(`{"FDNS_A":["203.0.113.5,a.example.com","198.51.100.9,b.example.com"],"RDNS":["c.example.com"]}`, 200))
+	defer srv.Close()
+	old := bufferoverBaseURL
+	bufferoverBaseURL = srv.URL
+	defer func() { bufferoverBaseURL = old }()
+	var ips []string
+	s := &Session{
+		HTTP:     httpx.New(httpx.Options{SourceName: "bufferover", TargetDomain: "example.com", MaxRetries: -1, BackoffBase: time.Millisecond}),
+		Creds:    map[string]string{"api_key": "k"},
+		MaxPages: 1,
+		ReportIP: func(ip string) { ips = append(ips, ip) },
+	}
+	if err := (bufferover{}).Enumerate(context.Background(), "example.com", s, func(string) {}); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(ips, []string{"203.0.113.5", "198.51.100.9"}) {
+		t.Fatalf("ips %v", ips)
+	}
+}

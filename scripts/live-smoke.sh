@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # live-smoke.sh - live smoke test of every default, no-key Lunatic source.
 #
-# NOTE: this script could NOT be run during development: the build environment's
-# egress proxy blocked live requests to the providers, so all adapters were
-# tested offline only (httptest fixtures). Run it on your own machine to verify
-# the adapters against the real services.
+# NOTE: adapters are tested offline only (httptest fixtures); live tests were
+# not run for this release. Run this script on your own machine to verify the
+# adapters against the real services.
 #
 # It builds lunatic, then runs each default source that needs no API key one at
 # a time (sequentially, with a pause in between so provider rate limits are

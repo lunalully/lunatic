@@ -5,7 +5,7 @@
 // (community plan prefix; other plans use a different prefix, not configurable here).
 // Auth: "X-BLOBR-KEY: <api_key>". Community plan: 100 requests/month, so at most
 // redhuntlabsMaxPages (3) requests are made regardless of MaxPages.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

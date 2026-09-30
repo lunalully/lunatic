@@ -1,13 +1,14 @@
 // Package sources defines the contract every provider adapter implements and
 // the registry adapters join from their init() functions.
 //
-// One adapter = one file internal/sources/<name>.go. See AGENTS.md.
+// One adapter = one file internal/sources/<name>.go. See docs/DEVELOPMENT.md.
 package sources
 
 import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/lunalully/lunatic/internal/errs"
@@ -59,6 +60,10 @@ type Info struct {
 	DisabledReason string
 	RPS            float64 // provider rate limit (requests/second) for httpx; 0 = unlimited
 	Burst          int     // token bucket burst (default 1)
+	// Phase2 sources run after every phase-1 source has finished and receive
+	// the public IP addresses phase-1 providers already returned (Session.IPs).
+	// They never resolve DNS and never contact those IPs.
+	Phase2 bool
 }
 
 // AllCredFields returns CredFields followed by OptCredFields.
@@ -81,6 +86,21 @@ type Session struct {
 	// MaxPages is the maximum number of paginated requests (default 10);
 	// adapters must stop at this.
 	MaxPages int
+	// ReportIP is set by the runner for phase-1 sources. Adapters call s.IP for
+	// an address their provider already returned; no extra request is made.
+	ReportIP func(ip string)
+	// IPs holds the unique public addresses phase-1 sources reported for the
+	// current domain (sorted). Only filled for Info.Phase2 sources. They may
+	// only be sent to a provider as query data, never contacted.
+	IPs []string
+}
+
+// IP reports an IP address received from the provider (nil-safe). The runner
+// keeps only unique public addresses.
+func (s *Session) IP(ip string) {
+	if s != nil && s.ReportIP != nil {
+		s.ReportIP(strings.TrimSpace(ip))
+	}
 }
 
 // Logf logs through Log if set.

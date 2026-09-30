@@ -5,7 +5,7 @@
 // Parsing: scope-aware text extraction (scope.FindInText) over the page. If the site answers with a bot
 // challenge (Cloudflare "Just a moment", CAPTCHA, HTTP 403/503) the source reports ErrUnavailable; no bypass is attempted.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment (site returned 403 to the research fetcher).
+// Verification: fixture only; live test not run for this release (site returned 403 to an automated fetch).
 package sources
 
 import (

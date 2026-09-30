@@ -3,8 +3,8 @@
 // Endpoint: GET /dns/{domain}/subdomains on dns.projectdiscovery.io.
 // Auth: required; the raw key goes in the Authorization header (no Bearer prefix,
 // per chaos-client). Response holds bare labels; FQDN = label + "." + domain.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

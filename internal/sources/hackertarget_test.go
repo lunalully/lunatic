@@ -160,3 +160,23 @@ func g2session(name string, creds map[string]string, maxPages int) *Session {
 func newIntelxServer(h http.HandlerFunc, hit *bool) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { *hit = true; h(w, r) }))
 }
+
+func TestHackertargetReportsIPs(t *testing.T) {
+	srv := httptest.NewServer(g2serve(200, g2fixture(t, "hackertarget", "success.txt")))
+	defer srv.Close()
+	old := hackertargetBaseURL
+	hackertargetBaseURL = srv.URL
+	defer func() { hackertargetBaseURL = old }()
+	var ips []string
+	s := &Session{
+		HTTP:     httpx.New(httpx.Options{SourceName: "hackertarget", TargetDomain: "example.com", MaxRetries: -1, BackoffBase: time.Millisecond}),
+		MaxPages: 1,
+		ReportIP: func(ip string) { ips = append(ips, ip) },
+	}
+	if err := (hackertarget{}).Enumerate(context.Background(), "example.com", s, func(string) {}); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(ips, []string{"192.0.2.1", "192.0.2.2", "192.0.2.3"}) {
+		t.Fatalf("ips %v", ips)
+	}
+}

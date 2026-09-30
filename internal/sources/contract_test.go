@@ -24,8 +24,8 @@ func (c *countingTransport) RoundTrip(*http.Request) (*http.Response, error) {
 
 func TestContractRegistry(t *testing.T) {
 	all := All()
-	if len(all) != 54 {
-		t.Errorf("registered sources = %d, want 54", len(all))
+	if len(all) != 57 {
+		t.Errorf("registered sources = %d, want 57", len(all))
 	}
 	nameRe := regexp.MustCompile(`^[a-z0-9]+$`)
 	for _, src := range all {

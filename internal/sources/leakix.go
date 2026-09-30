@@ -4,7 +4,7 @@
 // Auth: required; header api-key. Free plan exists (limited requests, delayed results); ~1 request/s; 429 -> ErrRateLimited.
 // Response: JSON array [{"subdomain":"...","distinct_ips":N,"last_seen":"..."}]; no pagination documented. Only "subdomain" is emitted.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment (keyless request returned 401 via research fetcher).
+// Verification: fixture only; live test not run for this release (keyless request returned 401).
 package sources
 
 import (

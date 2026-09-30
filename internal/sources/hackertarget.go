@@ -2,11 +2,13 @@
 // Docs: https://hackertarget.com/find-dns-host-records/ and https://hackertarget.com/ip-tools/
 // Endpoint: GET https://api.hackertarget.com/hostsearch/?q=<domain> (stored DNS dataset, not live lookups).
 // Auth: optional; without a key the free per-IP quota applies. A configured key is sent in the X-API-Key header.
+// Other ip-tools endpoints were reviewed: dnslookup (live resolution), mtr/ping/nmap/banner/httpheaders/pagelinks (live)
+// and reverseiplookup/reversedns (return unrelated hosts of an IP) are NOT used; hostsearch is the only domain-based passive one.
 // Response: text/plain CSV "host,ip" per line. Failures (quota, bad parameter) are returned as plain text with HTTP 200,
-// so the body is inspected before being parsed; such text is never treated as data. Only the host column is emitted.
+// so the body is inspected before being parsed; such text is never treated as data. Only the host column is emitted; the ip column is reported via Session.IP (no extra request).
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment
-// (one shared-egress fetch during research returned the quota message "API count exceeded").
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check
+// (one fetch while writing the adapter returned the quota message "API count exceeded").
 package sources
 
 import (
@@ -67,20 +69,24 @@ func (hackertarget) Enumerate(ctx context.Context, domain string, s *Session, em
 		}
 		return fmt.Errorf("%w: hackertarget error message: %.80s", ErrUnexpected, body)
 	}
-	var hosts []string
+	var hosts, ips []string
 	for _, line := range strings.Split(body, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" {
 			continue
 		}
-		host, _, ok := strings.Cut(line, ",")
+		host, ip, ok := strings.Cut(line, ",")
 		if !ok || strings.ContainsAny(host, " <>\t") {
 			return fmt.Errorf("%w: hackertarget returned non-CSV text", ErrUnexpected)
 		}
 		hosts = append(hosts, host)
+		ips = append(ips, ip)
 	}
 	for _, h := range hosts {
 		emit(h)
+	}
+	for _, ip := range ips { // already in the response; used only by phase-2 sources
+		s.IP(ip)
 	}
 	return nil
 }

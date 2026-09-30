@@ -5,8 +5,8 @@
 // parameter (the docs offer no header form; httpx redacts configured secrets).
 // Needs a paid Domain API plan; the free API does not return subdomains.
 // Result: Results[].Result.Paths[] with SubDomain + Domain -> FQDN.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

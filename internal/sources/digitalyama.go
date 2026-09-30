@@ -3,8 +3,8 @@
 // and not readable here; path per subfinder's adapter). Endpoint:
 // GET /subdomain_finder?domain=<domain> . Auth: required, header x-api-key.
 // Credit-metered (1 credit per call), vendor limit 1 call/second.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

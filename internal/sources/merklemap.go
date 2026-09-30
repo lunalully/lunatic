@@ -5,8 +5,8 @@
 // Endpoint: GET https://api.merklemap.com/v1/search?query=*.<domain>&page=<n> (page is zero-indexed).
 // Auth: "Authorization: Bearer <api_key>". Paid plan (no free tier confirmed).
 // Only stored data is queried; no scan is triggered.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
-// Response fields (count, results[].hostname) follow the research file; they are not confirmed live.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
+// Response fields (count, results[].hostname) follow the provider docs; they are not confirmed live.
 //
 // This file also holds two small helpers (merklemapClassify, merklemapFlatten)
 // shared by the other group-3 adapters.

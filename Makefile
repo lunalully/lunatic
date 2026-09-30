@@ -6,7 +6,7 @@ PREFIX  ?= $(shell if [ -w /usr/local/bin ]; then echo /usr/local/bin; else echo
 .PHONY: build test race vet fmt check install clean smoke
 
 build:
-	go build -ldflags "$(LDFLAGS)" -o $(BIN) ./cmd/lunatic
+	go build -trimpath -ldflags "$(LDFLAGS)" -o $(BIN) ./cmd/lunatic
 
 test:
 	go test ./...

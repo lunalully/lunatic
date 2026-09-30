@@ -1,8 +1,14 @@
 package sources
 
 import (
+	"context"
 	"net/http"
+	"net/http/httptest"
+	"reflect"
 	"testing"
+	"time"
+
+	"github.com/lunalully/lunatic/internal/httpx"
 )
 
 func TestDnsdumpsterSuccess(t *testing.T) {
@@ -37,4 +43,27 @@ func TestDnsdumpsterErrorBodies(t *testing.T) {
 
 func TestDnsdumpsterErrors(t *testing.T) {
 	g2errors(t, dnsdumpster{}, &dnsdumpsterBaseURL, map[string]string{"api_key": "K"}, "<html>")
+}
+
+func TestDnsdumpsterReportsIPs(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"a":[{"host":"a.example.com","ips":[{"ip":"203.0.113.5"},{"ip":"203.0.113.6"}]}]}`))
+	}))
+	defer srv.Close()
+	old := dnsdumpsterBaseURL
+	dnsdumpsterBaseURL = srv.URL
+	defer func() { dnsdumpsterBaseURL = old }()
+	var ips []string
+	s := &Session{
+		HTTP:     httpx.New(httpx.Options{SourceName: "dnsdumpster", TargetDomain: "example.com", MaxRetries: -1, BackoffBase: time.Millisecond}),
+		Creds:    map[string]string{"api_key": "k"},
+		MaxPages: 1,
+		ReportIP: func(ip string) { ips = append(ips, ip) },
+	}
+	if err := (dnsdumpster{}).Enumerate(context.Background(), "example.com", s, func(string) {}); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(ips, []string{"203.0.113.5", "203.0.113.6"}) {
+		t.Fatalf("ips %v", ips)
+	}
 }

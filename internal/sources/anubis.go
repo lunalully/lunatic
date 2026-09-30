@@ -2,8 +2,8 @@
 // Docs: https://github.com/jonluca/Anubis-DB and https://anubisdb.com
 // Endpoint: GET /anubis/subdomains/{domain} (read-only; the POST submit
 // endpoint is never used). Auth: none. Free; 60 requests/10 s per IP.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 // Note: HTTP 403 (documented as "invalid input") is mapped to ErrAuth by httpx.
 package sources
 

@@ -6,7 +6,7 @@
 // that answers 4xx is skipped, and the source fails only if every endpoint failed.
 // Auth: required; header Authorization: Bearer <token>. Response: {"summary":{"other":N,"values":{"<host>":count}}}.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

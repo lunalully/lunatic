@@ -3,8 +3,8 @@
 // public tools. Endpoint: GET /?q=%25.<domain>&output=json (HTTP JSON only; the
 // direct PostgreSQL interface is deliberately not used). Auth: none.
 // Slow and sometimes unavailable; rely on the per-source timeout.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

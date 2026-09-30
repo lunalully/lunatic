@@ -6,7 +6,7 @@
 // (/api/search/..., X-API-KEY) is documented only superficially and is not implemented.
 // Auth: none. Not in the default run (unofficial scraping). Any CAPTCHA/challenge or block is
 // terminal (ErrUnavailable); it is never bypassed.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

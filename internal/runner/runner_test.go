@@ -326,3 +326,75 @@ func TestSkipReasonIgnoresOptionalFields(t *testing.T) {
 		t.Fatalf("reason %q", r)
 	}
 }
+
+func TestTwoPhaseIPs(t *testing.T) {
+	var order []string
+	var mu sync.Mutex
+	mark := func(s string) { mu.Lock(); order = append(order, s); mu.Unlock() }
+	p1 := func(name string, ips ...string) Task {
+		return src(name, func(_ context.Context, d string, s *sources.Session, emit func(string)) error {
+			time.Sleep(20 * time.Millisecond)
+			for _, ip := range ips {
+				s.IP(ip)
+			}
+			emit("a." + d)
+			mark("p1-" + name)
+			return nil
+		})
+	}
+	var gotIPs []string
+	p2 := Task{Source: &fake{info: sources.Info{Name: "second", Phase2: true}, fn: func(_ context.Context, d string, s *sources.Session, emit func(string)) error {
+		mark("p2")
+		gotIPs = append([]string(nil), s.IPs...)
+		if s.ReportIP != nil {
+			t.Error("phase-2 session must not have ReportIP")
+		}
+		emit("found." + d)
+		emit("out.other.test")
+		return nil
+	}}}
+	tasks := []Task{
+		p2,
+		p1("x", "93.184.216.34", "10.0.0.1", "127.0.0.1", "192.168.1.1", "169.254.1.1", "203.0.113.5", "::1", "fe80::1", "garbage", "93.184.216.34", " 2606:2800:220:1::1 "),
+		p1("y", "8.8.8.8", "::ffff:1.1.1.1"),
+	}
+	res := Run(context.Background(), []string{"example.com"}, tasks, Options{})
+	if len(order) != 3 || order[2] != "p2" {
+		t.Fatalf("order %v", order)
+	}
+	want := []string{"1.1.1.1", "2606:2800:220:1::1", "8.8.8.8", "93.184.216.34"}
+	if !reflect.DeepEqual(gotIPs, want) {
+		t.Fatalf("ips %v want %v", gotIPs, want)
+	}
+	seen := map[string][]string{}
+	for _, f := range res.Findings {
+		seen[f.Subdomain] = f.Sources
+	}
+	if !reflect.DeepEqual(seen["found.example.com"], []string{"second"}) || seen["out.other.test"] != nil {
+		t.Fatalf("findings %+v", res.Findings)
+	}
+}
+
+func TestPhase2NoIPsAndPerDomain(t *testing.T) {
+	var got [][]string
+	p2 := Task{Source: &fake{info: sources.Info{Name: "second", Phase2: true}, fn: func(_ context.Context, d string, s *sources.Session, emit func(string)) error {
+		got = append(got, append([]string{d}, s.IPs...))
+		return nil
+	}}}
+	p1 := src("one", func(_ context.Context, d string, s *sources.Session, emit func(string)) error {
+		if d == "b.test" {
+			s.IP("8.8.4.4")
+		}
+		return nil
+	})
+	res := Run(context.Background(), []string{"a.test", "b.test"}, []Task{p1, p2}, Options{})
+	want := [][]string{{"a.test"}, {"b.test", "8.8.4.4"}}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got %v", got)
+	}
+	for _, o := range res.Outcomes {
+		if o.Status != StatusOK {
+			t.Fatalf("%+v", o)
+		}
+	}
+}

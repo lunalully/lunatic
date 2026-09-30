@@ -8,7 +8,7 @@
 // typed errors. Only the hostname part is emitted (scheme, port and path stripped; IPs are dropped by the runner).
 // Paging stops on a short page or at MaxPages. Free-tier limits and F-coin costs are unverified.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

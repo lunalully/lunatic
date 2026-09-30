@@ -7,7 +7,7 @@
 // A stream without a terminating cond is treated as truncated (ErrUnexpected). HTTP 404 means "no results".
 // Only rrname is emitted. Paid product; quotas are per key.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

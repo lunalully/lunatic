@@ -1,11 +1,11 @@
 // Package sources: rsecloud adapter.
 //
 // Provider: RSECloud. Docs: https://documenter.getpostman.com/view/33929903/2sA35G4N2c (not readable
-// by the research tooling; endpoint from the Subfinder reference, not confirmed in official docs).
+// when this adapter was written; endpoint from the Subfinder reference, not confirmed in official docs).
 // Endpoint: GET https://api.rsecloud.com/api/v2/subdomains/passive/<d>?page=<n>.
 // The /active/ endpoint is NEVER called (semantics unconfirmed): rsecloudAllowedPath is the only prefix used.
 // Auth: "X-API-Key: <api_key>". Plan/limits unknown.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

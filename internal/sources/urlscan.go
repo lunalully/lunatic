@@ -21,7 +21,7 @@
 //	of page.url / task.url (hostnames only; nothing is fetched).
 //
 // Checked:      2026-09-29
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

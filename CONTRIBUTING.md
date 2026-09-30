@@ -1,6 +1,6 @@
 # Contribuindo com o Lunatic
 
-Obrigado por ajudar. O Lunatic é uma ferramenta de reconhecimento **estritamente passiva**; toda contribuição precisa preservar isso. As regras técnicas detalhadas para adaptadores estão em [AGENTS.md](AGENTS.md); o panorama das fontes, em [docs/SOURCES.md](docs/SOURCES.md).
+Obrigado por ajudar. O Lunatic é uma ferramenta de reconhecimento **estritamente passiva**; toda contribuição precisa preservar isso. As regras técnicas detalhadas para adaptadores estão em [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md); o panorama das fontes, em [docs/SOURCES.md](docs/SOURCES.md).
 
 ## Regras de contribuição (somente passivo)
 

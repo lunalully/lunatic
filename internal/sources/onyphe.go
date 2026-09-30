@@ -5,7 +5,7 @@
 // (stored data only). The v3 on-demand APIs trigger live actions and are NEVER used:
 // onypheAllowedPath is the only path prefix requested.
 // Auth: "Authorization: bearer <api_key>". Paid plans (no free tier confirmed).
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 // The "resolver" category name comes from the Subfinder reference.
 package sources
 

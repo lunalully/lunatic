@@ -1,11 +1,11 @@
 // Provider: AlienVault OTX (LevelBlue Open Threat Exchange).
 // Docs: https://otx.alienvault.com/assets/static/external_api.html (not readable
-// from the build environment; endpoint path taken from subfinder's adapter).
+// when this adapter was written; endpoint path taken from subfinder's adapter).
 // Endpoint: GET /api/v1/indicators/domain/{domain}/passive_dns (read-only query).
 // Auth: optional. When configured the key is sent in the X-OTX-API-KEY header
 // (the header named by the OTX docs). Free account; higher hourly quota with key.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

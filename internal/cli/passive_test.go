@@ -50,8 +50,8 @@ func TestPassiveRulesEndToEnd(t *testing.T) {
 	old := testTransport
 	defer func() { testTransport = old }()
 	all := sources.All()
-	if len(all) < 54 {
-		t.Fatalf("expected >= 54 registered sources, got %d", len(all))
+	if len(all) < 57 {
+		t.Fatalf("expected >= 57 registered sources, got %d", len(all))
 	}
 	envMap := map[string]string{}
 	for _, s := range all {

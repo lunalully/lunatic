@@ -4,8 +4,8 @@
 // Auth: optional; unauthenticated use has a small hourly quota, with a key it is
 // sent as "Authorization: Bearer <key>". Pagination: `after` = last issuance id
 // until an empty array is returned (bounded by Session.MaxPages).
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

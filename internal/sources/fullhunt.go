@@ -6,7 +6,7 @@
 // Response: {"hosts":[...],"message":"","status":200}; a non-200 "status" in the body is mapped to a typed error.
 // Results can be truncated by plan (not signalled reliably).
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

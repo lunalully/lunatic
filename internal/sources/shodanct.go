@@ -9,7 +9,7 @@
 // Auth:         none observed. The provider does not document limits.
 // Pagination:   none (single JSON array).
 // Checked:      2026-09-29
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

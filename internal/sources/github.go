@@ -8,7 +8,7 @@
 // Extraction: hostnames only, via scope.FindInText over text_matches[].fragment; fragment text is discarded.
 // HTTP 422 on a later page (result window exceeded) ends pagination.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

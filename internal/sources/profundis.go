@@ -5,7 +5,7 @@
 // streamed text, one subdomain per line. NOTE: endpoint from Subfinder reference, not in official docs
 // (the docs list only /common/data/hosts and /common/data/dns).
 // Auth: "X-API-KEY: <api_key>"; paid subscription/credits required (each call costs credits).
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

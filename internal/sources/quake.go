@@ -6,7 +6,7 @@
 // {"query":"domain: \"<d>\"","include":["service.http.host"],"latest":true,"size":N,"start":N}
 // (search over indexed data; "latest" only selects newest stored data). Endpoint from Subfinder reference.
 // Auth: "X-QuakeToken: <api_key>". Each result consumes account quota.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

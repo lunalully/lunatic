@@ -9,7 +9,7 @@
 // Auth:         optional "Authorization: Bearer KEY".
 // Pagination:   none; exactly ONE request per run to conserve the daily quota.
 // Checked:      2026-09-29
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

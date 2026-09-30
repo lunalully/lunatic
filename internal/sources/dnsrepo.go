@@ -7,7 +7,7 @@
 // none). Pagination stops when a page is short, adds no new names (guards against an ignored page parameter) or at MaxPages.
 // A JSON object response is treated as an error message.
 // Date checked: 2026-09-29.
-// Verification: fixture only; live test not possible from build environment.
+// Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

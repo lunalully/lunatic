@@ -5,7 +5,7 @@
 // Endpoint: GET https://api.securitytrails.com/v1/domain/<d>/subdomains (returns labels; the domain
 // is appended). The DSL scroll endpoints are not used.
 // Auth: "APIKEY: <api_key>" header. Paid plans; free API access unconfirmed.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (

@@ -3,8 +3,8 @@
 // environment; endpoint per subfinder's adapter).
 // Endpoint: GET /api/{domain}/subdomains/ . Auth: required, header X-Access-Token.
 // Free key available; credit limits not confirmed.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from
-// build environment (egress blocked).
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release
+// (run scripts/live-smoke.sh to check).
 package sources
 
 import (

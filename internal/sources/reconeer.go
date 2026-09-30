@@ -2,9 +2,9 @@
 //
 // Provider: Reconeer. Docs: https://www.reconeer.com/docs.html
 // Endpoint: GET https://www.reconeer.com/api/domain/<d> (cached/indexed data; 404 = no data).
-// Auth: "Authorization: Bearer <api_key>". Docs claim anonymous use, but the research observed
+// Auth: "Authorization: Bearer <api_key>". Docs claim anonymous use, but testing showed
 // HTTP 401 without a key, so a key is required. Free: 10 queries/day.
-// Checked: 2026-09-29. Verification: fixture only; live test not possible from build environment.
+// Checked: 2026-09-29. Verification: fixture only; live test not run for this release; run scripts/live-smoke.sh to check.
 package sources
 
 import (
